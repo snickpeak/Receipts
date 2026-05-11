@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.receiptsapp.journal",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Receipts uses Face ID to protect your private journal entries with biometric authentication.",
         "NSCameraUsageDescription": "Receipts uses your camera to attach photos and optionally read visible text (on-device) into your entry notes.",
