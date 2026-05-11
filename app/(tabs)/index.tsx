@@ -43,6 +43,7 @@ import { useSettings } from "@/context/SettingsContext";
 import { useColors } from "@/hooks/useColors";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useTranslation } from "@/hooks/useTranslation";
+import { getRestApiBase } from "@/lib/env";
 import { mergeTags, getTagColor } from "@/lib/tagsLib";
 import { loadPinnedStripOrder, savePinnedStripOrder, sortPinnedEntries } from "@/lib/pinnedStripOrder";
 import { computeStreak, loadBestStreak, persistBestStreak, STREAK_MILESTONES } from "@/lib/streakLib";
@@ -424,7 +425,7 @@ export default function TimelineScreen() {
                 <Text style={[styles.streakText, { color: "#f59e0b" }]}>{streak.current}</Text>
               </Pressable>
             )}
-            {(!online || pendingSyncCount > 0) && (
+            {(!online || (pendingSyncCount > 0 && !!getRestApiBase())) && (
               <View style={[styles.offlineChip, { backgroundColor: !online ? "#f59e0b22" : "#3b82f622", borderColor: !online ? "#f59e0b66" : "#3b82f666" }]}>
                 <Feather name={!online ? "cloud-off" : "upload-cloud"} size={11} color={!online ? "#f59e0b" : "#3b82f6"} />
                 <Text style={[styles.offlineChipText, { color: !online ? "#f59e0b" : "#3b82f6" }]}>
@@ -435,27 +436,25 @@ export default function TimelineScreen() {
             <Pressable style={[styles.iconBtn, { backgroundColor: colors.muted }]} onPress={() => router.push("/settings")}>
               <Feather name="settings" size={16} color={colors.mutedForeground} />
             </Pressable>
-            <FadeInView from="right" distance={30} delay={200} spring>
-              <PressableScale
-                spring
-                haptic="light"
-                style={[styles.addButton, { backgroundColor: colors.foreground }]}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push("/add");
-                }}
-                onLongPress={() => {
-                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  setFabMenuOpen(true);
-                }}
-                delayLongPress={420}
-              >
-                <Feather name="plus" size={18} color={colors.background} />
-              </PressableScale>
-            </FadeInView>
+            <PressableScale
+              spring
+              haptic="light"
+              style={[styles.addButton, { backgroundColor: colors.foreground }]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push("/add");
+              }}
+              onLongPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setFabMenuOpen(true);
+              }}
+              delayLongPress={420}
+            >
+              <Feather name="plus" size={18} color={colors.background} />
+            </PressableScale>
           </View>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statsRow}>
+        <View style={styles.statsRow}>
           {TAG_ORDER.map((tag) => (
             <TagStatPill
               key={tag}
@@ -469,7 +468,7 @@ export default function TimelineScreen() {
               }}
             />
           ))}
-        </ScrollView>
+        </View>
       </Animated.View>
 
       {visibleEntries.length === 0 ? (
@@ -617,7 +616,7 @@ const styles = StyleSheet.create({
   offlineChipText: { fontSize: 11, fontWeight: "600" },
   iconBtn: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   addButton: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  statsRow: { paddingRight: 4 },
+  statsRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   sectionHeader: { fontSize: 10, fontFamily: "Inter_700Bold", letterSpacing: 2, paddingHorizontal: 20, paddingTop: 22, paddingBottom: 10 },
   filterEmpty: { alignItems: "center", justifyContent: "center", paddingTop: 60 },
   filterEmptyText: { fontSize: 15, fontFamily: "Inter_400Regular" },

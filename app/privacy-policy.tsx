@@ -114,7 +114,7 @@ export default function PrivacyPolicyScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40 }]}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 100 }]}
         showsVerticalScrollIndicator={false}
       >
         <Text style={[styles.effectiveDate, { color: colors.mutedForeground }]}>

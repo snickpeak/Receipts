@@ -193,18 +193,18 @@ const styles = StyleSheet.create({
   brandLetter: {
     fontSize: 30,
     fontFamily: "Inter_700Bold",
-    letterSpacing: 2,
+    letterSpacing: 5,
   },
   textBlock: {
     alignItems: "center",
     gap: 10,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: "Inter_700Bold",
     textAlign: "center",
-    letterSpacing: -0.6,
-    lineHeight: 35,
+    letterSpacing: -0.5,
+    lineHeight: 33,
   },
   subtitle: {
     fontSize: 15,

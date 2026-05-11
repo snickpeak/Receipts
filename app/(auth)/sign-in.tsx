@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthGlowBackground } from "@/components/AuthGlowBackground";
+import { useSettings } from "@/context/SettingsContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   isBiometricAvailable,
@@ -59,8 +60,9 @@ export default function SignInScreen() {
   const topInset = Platform.OS === "web" ? Math.max(insets.top, 67) : insets.top;
   const bottomInset = Platform.OS === "web" ? 34 : insets.bottom;
 
+  const { settings } = useSettings();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme !== "light";
+  const isDark = settings.appearanceMode === "dark" || (settings.appearanceMode === "system" && colorScheme === "dark");
   const c = {
     bg: isDark ? "#080808" : "#f5f5f5",
     text: isDark ? "#f0f0f0" : "#111111",
