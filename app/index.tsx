@@ -2,38 +2,30 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, useColorScheme, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PressableScale } from "@/components/PressableScale";
+import { useColors } from "@/hooks/useColors";
 
 export default function Index() {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, 24);
-  const isDark = useColorScheme() === "dark";
-
-  const c = {
-    bg: isDark ? "#080808" : "#ffffff",
-    brand: isDark ? "#555" : "#999",
-    title: isDark ? "#fff" : "#0a0a0a",
-    subtitle: isDark ? "#777" : "#666",
-    primaryBtnText: "#fff",
-    secondaryBtnText: "#a855f7",
-  };
+  const colors = useColors();
 
   return (
-    <View style={[styles.container, { backgroundColor: c.bg, paddingTop: topInset, paddingBottom: Math.max(insets.bottom, 24) }]}>
+    <View style={[styles.container, { backgroundColor: colors.background, paddingTop: topInset, paddingBottom: Math.max(insets.bottom, 24) }]}>
       <LinearGradient colors={["#a855f730", "transparent"]} style={styles.logoWrap}>
         <Feather name="layers" size={34} color="#a855f7" />
       </LinearGradient>
-      <Text style={[styles.brand, { color: c.brand }]}>RECEIPTS</Text>
-      <Text style={[styles.title, { color: c.title }]}>Capture your day like proof.</Text>
-      <Text style={[styles.subtitle, { color: c.subtitle }]}>Preview the private journal, receipt capture, and AI search experience.</Text>
+      <Text style={[styles.brand, { color: colors.mutedForeground }]}>RECEIPTS</Text>
+      <Text style={[styles.title, { color: colors.foreground }]}>Capture your day like proof.</Text>
+      <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>Your private journal for moments, wins, and receipts worth keeping.</Text>
 
       <PressableScale style={styles.primaryBtn} haptic="medium" onPress={() => router.replace("/(tabs)")}>
-        <Text style={[styles.primaryBtnText, { color: c.primaryBtnText }]}>Open preview</Text>
+        <Text style={[styles.primaryBtnText, { color: "#fff" }]}>Open preview</Text>
       </PressableScale>
       <PressableScale style={styles.secondaryBtn} scaleTo={0.96} onPress={() => router.replace("/(auth)/sign-in")}>
-        <Text style={[styles.secondaryBtnText, { color: c.secondaryBtnText }]}>Go to sign in</Text>
+        <Text style={[styles.secondaryBtnText, { color: "#a855f7" }]}>Go to sign in</Text>
       </PressableScale>
     </View>
   );
