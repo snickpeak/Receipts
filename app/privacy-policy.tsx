@@ -45,7 +45,7 @@ const SECTIONS: Section[] = [
   {
     heading: "Voice memos",
     body:
-      "Voice memos recorded in the app are saved as audio files in your device's local app documents directory. They are never uploaded or transmitted anywhere. If you delete an entry, its attached voice memo is also deleted.",
+      "Voice memos are saved as audio files (named by timestamp, e.g. voice-memo-1234567890.m4a) inside the app's private sandboxed Documents folder on your device. This folder is managed by iOS and is not visible or accessible to other apps or through the Files app. Voice memos are never uploaded or transmitted anywhere. If you delete an entry, its attached voice memo is also deleted from that folder.",
   },
   {
     heading: "Location data",
@@ -85,7 +85,7 @@ const SECTIONS: Section[] = [
   {
     heading: "Children's privacy",
     body:
-      "Receipts is not directed at children under 13. We do not knowingly collect personal information from children. If you believe a child has provided personal information through the app, please contact us at support@receipts.app so we can address it.",
+      "Receipts is intended for users aged 13 and over. The app is not designed or marketed as a child-safe product — it is an adult journaling app. Users under 13 are not permitted to create an account or use the app. This is an age restriction, not a safety endorsement. We do not knowingly collect personal information from anyone under 13. If you believe a child under 13 has used the app, please contact us at receipts.support@gmail.com and we will delete any associated data.",
   },
   {
     heading: "Changes to this policy",
@@ -95,7 +95,7 @@ const SECTIONS: Section[] = [
   {
     heading: "Contact",
     body:
-      "Questions, concerns, or requests regarding your privacy or data can be sent to support@receipts.app. We aim to respond within 5 business days.",
+      "Questions, concerns, or requests regarding your privacy or data can be sent to receipts.support@gmail.com. We aim to respond within 5 business days.",
   },
 ];
 

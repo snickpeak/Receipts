@@ -1131,7 +1131,7 @@ export default function SettingsScreen() {
             icon="mail"
             label="Support"
             sublabel="Get help or send feedback"
-            onPress={() => { Linking.openURL("mailto:support@receipts.app").catch(() => {}); }}
+            onPress={() => { Linking.openURL("mailto:receipts.support@gmail.com").catch(() => {}); }}
             borderTop
           />
         </Section>
