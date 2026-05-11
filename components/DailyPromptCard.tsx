@@ -4,9 +4,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { useColors } from "@/hooks/useColors";
-import { getDailyPrompt } from "@/constants/prompts";
+import { DAILY_PROMPTS, getDailyBaseIndex } from "@/constants/prompts";
 
 const TAG_COLORS: Record<string, string> = {
   Money: "#22c55e",
@@ -27,7 +28,15 @@ const TAG_ICONS: Record<string, string> = {
 export function DailyPromptCard() {
   const colors = useColors();
   const [dismissed, setDismissed] = useState(false);
-  const prompt = getDailyPrompt();
+  const [shuffleIdx, setShuffleIdx] = useState(0);
+
+  const baseIndex = getDailyBaseIndex();
+  const prompt = DAILY_PROMPTS[(baseIndex + shuffleIdx) % DAILY_PROMPTS.length];
+
+  const spinValue = useSharedValue(0);
+  const spinStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${spinValue.value}deg` }],
+  }));
 
   if (dismissed) return null;
 
@@ -43,6 +52,15 @@ export function DailyPromptCard() {
     setDismissed(true);
   };
 
+  const handleShuffle = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    spinValue.value = withSequence(
+      withTiming(180, { duration: 220 }),
+      withTiming(360, { duration: 220 }),
+    );
+    setShuffleIdx((i) => i + 1);
+  };
+
   return (
     <LinearGradient
       colors={[tagColor + "20", tagColor + "08", "transparent"]}
@@ -51,13 +69,20 @@ export function DailyPromptCard() {
       style={[styles.card, { borderColor: tagColor + "30" }]}
     >
       <View style={styles.topRow}>
-        <View style={[styles.labelRow]}>
+        <View style={styles.labelRow}>
           <View style={[styles.dot, { backgroundColor: tagColor }]} />
           <Text style={[styles.label, { color: tagColor }]}>TODAY'S PROMPT · {prompt.tag.toUpperCase()}</Text>
         </View>
-        <Pressable onPress={handleDismiss} hitSlop={10}>
-          <Feather name="x" size={14} color={colors.mutedForeground} />
-        </Pressable>
+        <View style={styles.topActions}>
+          <Pressable onPress={handleShuffle} hitSlop={10}>
+            <Animated.View style={spinStyle}>
+              <Feather name="refresh-cw" size={13} color={colors.mutedForeground} />
+            </Animated.View>
+          </Pressable>
+          <Pressable onPress={handleDismiss} hitSlop={10}>
+            <Feather name="x" size={14} color={colors.mutedForeground} />
+          </Pressable>
+        </View>
       </View>
 
       <Text style={[styles.promptText, { color: colors.foreground }]}>{prompt.text}</Text>
@@ -93,6 +118,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+    flex: 1,
+  },
+  topActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   dot: {
     width: 6,

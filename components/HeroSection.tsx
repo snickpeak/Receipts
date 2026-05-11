@@ -9,12 +9,13 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
 
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { FadeInView } from "@/components/animations/FadeInView";
-import { getDailyPrompt } from "@/constants/prompts";
+import { DAILY_PROMPTS, getDailyBaseIndex } from "@/constants/prompts";
 import { useEntries } from "@/context/EntriesContext";
 import { useSettings } from "@/context/SettingsContext";
 import { useColors } from "@/hooks/useColors";
@@ -28,10 +29,25 @@ export function HeroSection() {
   const colors = useColors();
   const { entries } = useEntries();
   const { settings } = useSettings();
-  const prompt = getDailyPrompt();
+  const [shuffleIdx, setShuffleIdx] = useState(0);
+  const baseIndex = getDailyBaseIndex();
+  const prompt = DAILY_PROMPTS[(baseIndex + shuffleIdx) % DAILY_PROMPTS.length];
 
   const tagColor = getTagColor(prompt.tag, settings.customTags);
   const tagIcon = getTagIcon(prompt.tag, settings.customTags);
+
+  const spinValue = useSharedValue(0);
+  const spinStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${spinValue.value}deg` }],
+  }));
+
+  const handleShuffle = () => {
+    spinValue.value = withSequence(
+      withTiming(180, { duration: 220 }),
+      withTiming(360, { duration: 220 }),
+    );
+    setShuffleIdx((i) => i + 1);
+  };
 
   // Compute streak internally
   const [bestStreak, setBestStreak] = useState(0);
@@ -207,9 +223,19 @@ export function HeroSection() {
                 <Text style={styles.challengeBtnText}>Write about this</Text>
                 <Feather name="arrow-right" size={13} color="#000" />
               </View>
-              <Text style={[styles.challengeTapHint, { color: colors.mutedForeground }]}>
-                Tap to start
-              </Text>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  handleShuffle();
+                }}
+                hitSlop={10}
+                style={[styles.shuffleBtn, { backgroundColor: colors.muted }]}
+              >
+                <Animated.View style={spinStyle}>
+                  <Feather name="refresh-cw" size={13} color={colors.mutedForeground} />
+                </Animated.View>
+              </Pressable>
             </View>
           </LinearGradient>
         </Pressable>
@@ -415,5 +441,12 @@ const styles = StyleSheet.create({
   challengeTapHint: {
     fontSize: 11,
     fontFamily: "Inter_400Regular",
+  },
+  shuffleBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
