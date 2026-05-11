@@ -1,16 +1,33 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PressableScale } from "@/components/PressableScale";
 import { useColors } from "@/hooks/useColors";
 
+const TAGLINES = [
+  "Keep receipts on the life you're building.",
+  "Life happens fast. Write it down.",
+  "Your wins, your moments, your record.",
+  "Document what matters. Keep what's real.",
+  "Every moment worth keeping, saved.",
+  "The private journal that keeps score.",
+  "Save the moments that prove your story.",
+  "Your story, your receipts, your proof.",
+  "Write it down before it fades.",
+  "Because moments are worth more when you keep them.",
+];
+
 export default function Index() {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, 24);
   const colors = useColors();
+
+  const tagline = useMemo(() => {
+    return TAGLINES[Math.floor(Math.random() * TAGLINES.length)];
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, paddingTop: topInset, paddingBottom: Math.max(insets.bottom, 24) }]}>
@@ -18,7 +35,7 @@ export default function Index() {
         <Feather name="layers" size={34} color="#a855f7" />
       </LinearGradient>
       <Text style={[styles.brand, { color: colors.mutedForeground }]}>RECEIPTS</Text>
-      <Text style={[styles.title, { color: colors.foreground }]}>Capture your day like proof.</Text>
+      <Text style={[styles.title, { color: colors.foreground }]}>{tagline}</Text>
       <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>Your private journal for moments, wins, and receipts worth keeping.</Text>
 
       <PressableScale style={styles.primaryBtn} haptic="medium" onPress={() => router.replace("/(tabs)")}>
