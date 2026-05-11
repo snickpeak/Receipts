@@ -12,6 +12,8 @@ import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  InputAccessoryView,
+  Keyboard,
   Platform,
   Pressable,
   ScrollView,
@@ -322,9 +324,7 @@ export default function AddEntryScreen() {
             <Feather name="x" size={20} color={colors.foreground} />
           </Pressable>
           <Text style={[styles.screenLabel, { color: colors.mutedForeground }]}>{t.common.newEntry}</Text>
-          <Pressable style={[styles.saveBtn, { backgroundColor: canSave ? tagColor : colors.muted }]} onPress={handleSave} disabled={!canSave || saving}>
-            {saving ? <ActivityIndicator size="small" color="#000" /> : <Text style={[styles.saveBtnText, { color: canSave ? "#000" : colors.mutedForeground }]}>{t.common.save}</Text>}
-          </Pressable>
+          <View style={styles.iconBtn} />
         </View>
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -397,6 +397,7 @@ export default function AddEntryScreen() {
             onSubmitEditing={() => noteRef.current?.focus()}
             autoFocus
             multiline
+            inputAccessoryViewID={Platform.OS === "ios" ? "add-entry-toolbar" : undefined}
           />
           </FadeInView>
 
@@ -414,6 +415,7 @@ export default function AddEntryScreen() {
               multiline
               textAlignVertical="top"
               maxLength={NOTE_MAX_LENGTH}
+              inputAccessoryViewID={Platform.OS === "ios" ? "add-entry-toolbar" : undefined}
             />
             {voiceAvailable && (
               <Pressable onPress={handleVoice} style={[styles.voiceBtn, { backgroundColor: listening ? tagColor + "30" : colors.muted }]}>
@@ -433,6 +435,17 @@ export default function AddEntryScreen() {
               </Text>
             </View>
           )}
+          {/* Save button — sits right below the writing area */}
+          <Pressable
+            style={[styles.saveBtnFull, { backgroundColor: canSave ? tagColor : colors.muted }]}
+            onPress={handleSave}
+            disabled={!canSave || saving}
+          >
+            {saving
+              ? <ActivityIndicator size="small" color="#000" />
+              : <Text style={[styles.saveBtnText, { color: canSave ? "#000" : colors.mutedForeground }]}>{t.common.save}</Text>}
+          </Pressable>
+
           {/* Photo */}
           <FadeInView delay={300} from="bottom" distance={10} spring>
           {photoUri ? (
@@ -556,6 +569,17 @@ export default function AddEntryScreen() {
           {note.length > 0 && <Text style={[styles.charCount, { color: colors.mutedForeground }]}>{note.length}/{NOTE_MAX_LENGTH}</Text>}
         </View>
       </View>
+
+      {/* Keyboard toolbar — iOS only: dismiss button floats above the keyboard */}
+      {Platform.OS === "ios" && (
+        <InputAccessoryView nativeID="add-entry-toolbar">
+          <View style={styles.keyboardToolbar}>
+            <Pressable onPress={() => Keyboard.dismiss()} style={styles.keyboardDismissBtn} hitSlop={8}>
+              <Feather name="chevron-down" size={20} color="#8b8b9a" />
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      )}
     </LinearGradient>
   );
 }
@@ -565,8 +589,10 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 18, paddingBottom: 16 },
   iconBtn: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   screenLabel: { fontSize: 10, fontFamily: "Inter_700Bold", letterSpacing: 2.5 },
-  saveBtn: { paddingHorizontal: 20, paddingVertical: 9, borderRadius: 100, minWidth: 64, alignItems: "center", justifyContent: "center" },
+  saveBtnFull: { borderRadius: 14, paddingVertical: 14, alignItems: "center", justifyContent: "center" },
   saveBtnText: { fontSize: 14, fontFamily: "Inter_700Bold" },
+  keyboardToolbar: { flexDirection: "row", alignItems: "center", justifyContent: "flex-end", paddingHorizontal: 16, paddingVertical: 8, backgroundColor: "#f2f2f7", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "#c8c8cc" },
+  keyboardDismissBtn: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   scrollView: { flex: 1 },
   scrollContent: { paddingHorizontal: 22, paddingTop: 4, paddingBottom: 24, gap: 16 },
   templatesRow: { gap: 8, paddingBottom: 4 },
