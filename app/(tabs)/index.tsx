@@ -94,6 +94,10 @@ function TagStatPill({ tag, count, isActive, onPress, tagColor }: { tag: Tag; co
     <Animated.View style={animStyle}>
       <Pressable
         onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={`${tag}, ${count} ${count === 1 ? "entry" : "entries"}${isActive ? ", active filter" : ""}`}
+        accessibilityHint={isActive ? "Tap to clear filter" : "Tap to filter by this tag"}
+        accessibilityState={{ selected: isActive }}
         style={[
           pillStyles.pill,
           {
@@ -103,10 +107,10 @@ function TagStatPill({ tag, count, isActive, onPress, tagColor }: { tag: Tag; co
           },
         ]}
       >
-        <View style={[pillStyles.dot, { backgroundColor: count > 0 ? tagColor : colors.mutedForeground }]} />
+        <View style={[pillStyles.dot, { backgroundColor: count > 0 ? tagColor : colors.mutedForeground }]} accessible={false} />
         <Text style={[pillStyles.tag, { color: count > 0 ? colors.foreground : colors.mutedForeground }]}>{tag}</Text>
         <Text style={[pillStyles.count, { color: count > 0 ? tagColor : colors.mutedForeground }]}>{count}</Text>
-        {isActive && <Feather name="x" size={11} color={tagColor} style={{ marginLeft: 1 }} />}
+        {isActive && <Feather name="x" size={11} color={tagColor} style={{ marginLeft: 1 }} accessible={false} />}
       </Pressable>
     </Animated.View>
   );
@@ -420,9 +424,12 @@ export default function TimelineScreen() {
               <Pressable
                 onPress={() => router.push("/digest" as any)}
                 style={[styles.streakChip, { backgroundColor: "#f59e0b18", borderColor: "#f59e0b40" }]}
+                accessibilityRole="button"
+                accessibilityLabel={`${streak.current}-day streak`}
+                accessibilityHint="Tap to view your streak digest"
               >
-                <Text style={styles.streakEmoji}>🔥</Text>
-                <Text style={[styles.streakText, { color: "#f59e0b" }]}>{streak.current}</Text>
+                <Text style={styles.streakEmoji} accessible={false}>🔥</Text>
+                <Text style={[styles.streakText, { color: "#f59e0b" }]} accessible={false}>{streak.current}</Text>
               </Pressable>
             )}
             {(!online || (pendingSyncCount > 0 && !!getRestApiBase())) && (
@@ -433,8 +440,14 @@ export default function TimelineScreen() {
                 </Text>
               </View>
             )}
-            <Pressable style={[styles.iconBtn, { backgroundColor: colors.muted }]} onPress={() => router.push("/settings")}>
-              <Feather name="settings" size={16} color={colors.mutedForeground} />
+            <Pressable
+              style={[styles.iconBtn, { backgroundColor: colors.muted }]}
+              onPress={() => router.push("/settings")}
+              accessibilityRole="button"
+              accessibilityLabel="Open settings"
+              hitSlop={8}
+            >
+              <Feather name="settings" size={16} color={colors.mutedForeground} accessible={false} />
             </Pressable>
             <PressableScale
               spring
@@ -449,8 +462,11 @@ export default function TimelineScreen() {
                 setFabMenuOpen(true);
               }}
               delayLongPress={420}
+              accessibilityRole="button"
+              accessibilityLabel="Add new entry"
+              accessibilityHint="Long press for quick add options"
             >
-              <Feather name="plus" size={18} color={colors.background} />
+              <Feather name="plus" size={18} color={colors.background} accessible={false} />
             </PressableScale>
           </View>
         </View>

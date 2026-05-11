@@ -93,6 +93,7 @@ export function HeroSection() {
       <View style={styles.stackContainer}>
         {/* Layer 1 — deepest, most tilted */}
         <View
+          accessible={false}
           style={[
             styles.stackCard,
             styles.stackCardLayer1,
@@ -106,6 +107,7 @@ export function HeroSection() {
 
         {/* Layer 2 — medium tilt */}
         <View
+          accessible={false}
           style={[
             styles.stackCard,
             styles.stackCardLayer2,
@@ -119,6 +121,7 @@ export function HeroSection() {
 
         {/* Layer 3 — slight tilt */}
         <View
+          accessible={false}
           style={[
             styles.stackCard,
             styles.stackCardLayer3,
@@ -140,6 +143,8 @@ export function HeroSection() {
             styles.statsCard,
             { borderColor: accentColor + "35", shadowColor: accentColor },
           ]}
+          accessible={true}
+          accessibilityLabel={`Your receipts: ${entries.length} total${streak.current > 0 ? `, ${streak.current}-day streak` : ""}${topTag ? `, top tag ${topTag[0]}` : ""}`}
         >
           <View style={styles.statsCardLabel}>
             <View style={[styles.labelDot, { backgroundColor: accentColor }]} />
@@ -185,13 +190,16 @@ export function HeroSection() {
       </View>
 
       {/* ── Floating daily challenge card ─────────────────────────── */}
-      <Animated.View style={floatStyle}>
+      <Animated.View style={floatStyle} accessible={false}>
         <Pressable
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             router.push({ pathname: "/add", params: { prompt: prompt.text, tag: prompt.tag } } as any);
           }}
           style={({ pressed }) => [styles.challengePressable, { opacity: pressed ? 0.88 : 1 }]}
+          accessibilityRole="button"
+          accessibilityLabel={`Today's ${prompt.tag} challenge: ${prompt.text}`}
+          accessibilityHint="Tap to write about this prompt"
         >
           <LinearGradient
             colors={[tagColor + "2e", tagColor + "12", tagColor + "06"]}
@@ -231,8 +239,10 @@ export function HeroSection() {
                 }}
                 hitSlop={10}
                 style={[styles.shuffleBtn, { backgroundColor: colors.muted }]}
+                accessibilityRole="button"
+                accessibilityLabel="Show next challenge"
               >
-                <Animated.View style={spinStyle}>
+                <Animated.View style={spinStyle} accessible={false}>
                   <Feather name="refresh-cw" size={13} color={colors.mutedForeground} />
                 </Animated.View>
               </Pressable>

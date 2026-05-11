@@ -171,7 +171,15 @@ function SettingRow({
     return <View style={baseStyle}>{content}</View>;
   }
   return (
-    <PressableScale onPress={onPress} scaleTo={0.985} opacityTo={0.7} haptic="selection" style={baseStyle}>
+    <PressableScale
+      onPress={onPress}
+      scaleTo={0.985}
+      opacityTo={0.7}
+      haptic="selection"
+      style={baseStyle}
+      accessibilityRole="button"
+      accessibilityLabel={sublabel ? `${label}, ${sublabel}` : label}
+    >
       {content}
     </PressableScale>
   );

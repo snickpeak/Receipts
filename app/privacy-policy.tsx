@@ -106,8 +106,14 @@ export default function PrivacyPolicyScreen() {
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + 12, borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
-          <Feather name="chevron-left" size={22} color={colors.foreground} />
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
+          <Feather name="chevron-left" size={22} color={colors.foreground} accessible={false} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: colors.foreground }]}>Privacy Policy</Text>
         <View style={styles.backBtn} />

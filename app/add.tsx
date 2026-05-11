@@ -70,9 +70,13 @@ function AnimatedTagChip({ isSelected, color, icon, label, mutedBg, mutedFg, onP
         scale.value = withSequence(withTiming(0.88, { duration: 80 }), withSpring(1, { damping: 12, stiffness: 200 }));
         onPress();
       }}
-        style={[styles.tagChip, { backgroundColor: isSelected ? color + "25" : mutedBg, borderColor: isSelected ? color + "60" : "transparent", borderWidth: isSelected ? 1 : 0 }]}>
-        <Feather name={icon as any} size={14} color={isSelected ? color : mutedFg} />
-        <Text style={[styles.tagChipText, { color: isSelected ? color : mutedFg }]}>{label}</Text>
+        style={[styles.tagChip, { backgroundColor: isSelected ? color + "25" : mutedBg, borderColor: isSelected ? color + "60" : "transparent", borderWidth: isSelected ? 1 : 0 }]}
+        accessibilityRole="button"
+        accessibilityLabel={`${label} tag${isSelected ? ", selected" : ""}`}
+        accessibilityState={{ selected: isSelected }}
+      >
+        <Feather name={icon as any} size={14} color={isSelected ? color : mutedFg} accessible={false} />
+        <Text style={[styles.tagChipText, { color: isSelected ? color : mutedFg }]} accessible={false}>{label}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -89,8 +93,11 @@ function MoodButton({ emoji, active, tagColor, mutedBg, onPress }: { emoji: stri
           onPress();
         }}
         style={[styles.moodChip, { backgroundColor: active ? tagColor + "22" : mutedBg, borderColor: active ? tagColor : "transparent" }]}
+        accessibilityRole="button"
+        accessibilityLabel={`${emoji} mood${active ? ", selected" : ""}`}
+        accessibilityState={{ selected: active }}
       >
-        <Text style={styles.moodEmoji}>{emoji}</Text>
+        <Text style={styles.moodEmoji} accessible={false}>{emoji}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -320,8 +327,14 @@ export default function AddEntryScreen() {
       <View style={[styles.container, { paddingTop: topInset + 10, paddingBottom: bottomInset + 16 }]}>
         {/* Top bar */}
         <View style={styles.topBar}>
-          <Pressable onPress={() => router.back()} style={styles.iconBtn}>
-            <Feather name="x" size={20} color={colors.foreground} />
+          <Pressable
+            onPress={() => router.back()}
+            style={styles.iconBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+            hitSlop={8}
+          >
+            <Feather name="x" size={20} color={colors.foreground} accessible={false} />
           </Pressable>
           <Text style={[styles.screenLabel, { color: colors.mutedForeground }]}>{t.common.newEntry}</Text>
           <View style={styles.iconBtn} />
@@ -332,7 +345,13 @@ export default function AddEntryScreen() {
           <FadeInView delay={50} from="bottom" distance={8} spring>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templatesRow}>
             {TEMPLATES.map((tpl) => (
-              <Pressable key={tpl.id} onPress={() => handleTemplate(tpl)} style={[styles.tplChip, { backgroundColor: colors.muted }]}>
+              <Pressable
+                key={tpl.id}
+                onPress={() => handleTemplate(tpl)}
+                style={[styles.tplChip, { backgroundColor: colors.muted }]}
+                accessibilityRole="button"
+                accessibilityLabel={`Use ${tpl.label} template`}
+              >
                 <Text style={[styles.tplText, { color: colors.mutedForeground }]}>{tpl.label}</Text>
               </Pressable>
             ))}
@@ -342,8 +361,14 @@ export default function AddEntryScreen() {
           {/* Date picker */}
           <FadeInView delay={100} from="bottom" distance={8} spring>
           <View style={[styles.datePicker, { backgroundColor: colors.muted, borderColor: colors.border }]}>
-            <Pressable onPress={() => shiftDate(-1)} style={styles.dateArrow} hitSlop={8}>
-              <Feather name="chevron-left" size={16} color={colors.mutedForeground} />
+            <Pressable
+              onPress={() => shiftDate(-1)}
+              style={styles.dateArrow}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Previous day"
+            >
+              <Feather name="chevron-left" size={16} color={colors.mutedForeground} accessible={false} />
             </Pressable>
             <Pressable
               onPress={() => {
@@ -354,6 +379,8 @@ export default function AddEntryScreen() {
                 }
               }}
               style={styles.dateCenter}
+              accessibilityRole="button"
+              accessibilityLabel={isToday ? "Entry date: today" : `Entry date: ${formatEntryDate(entryDate)}, tap to reset to today`}
             >
               <Feather name="calendar" size={13} color={!isToday ? tagColor : colors.mutedForeground} />
               <Text style={[styles.dateText, { color: !isToday ? tagColor : colors.foreground }]}>
@@ -365,8 +392,16 @@ export default function AddEntryScreen() {
                 </View>
               )}
             </Pressable>
-            <Pressable onPress={() => shiftDate(1)} style={[styles.dateArrow, { opacity: isToday ? 0.3 : 1 }]} hitSlop={8} disabled={isToday}>
-              <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+            <Pressable
+              onPress={() => shiftDate(1)}
+              style={[styles.dateArrow, { opacity: isToday ? 0.3 : 1 }]}
+              hitSlop={8}
+              disabled={isToday}
+              accessibilityRole="button"
+              accessibilityLabel="Next day"
+              accessibilityState={{ disabled: isToday }}
+            >
+              <Feather name="chevron-right" size={16} color={colors.mutedForeground} accessible={false} />
             </Pressable>
           </View>
           </FadeInView>
@@ -418,8 +453,14 @@ export default function AddEntryScreen() {
               inputAccessoryViewID={Platform.OS === "ios" ? "add-entry-toolbar" : undefined}
             />
             {voiceAvailable && (
-              <Pressable onPress={handleVoice} style={[styles.voiceBtn, { backgroundColor: listening ? tagColor + "30" : colors.muted }]}>
-                <Feather name="mic" size={16} color={listening ? tagColor : colors.mutedForeground} />
+              <Pressable
+                onPress={handleVoice}
+                style={[styles.voiceBtn, { backgroundColor: listening ? tagColor + "30" : colors.muted }]}
+                accessibilityRole="button"
+                accessibilityLabel={listening ? "Stop recording" : "Start voice recording"}
+                accessibilityState={{ selected: listening }}
+              >
+                <Feather name="mic" size={16} color={listening ? tagColor : colors.mutedForeground} accessible={false} />
               </Pressable>
             )}
           </View>
@@ -440,6 +481,9 @@ export default function AddEntryScreen() {
             style={[styles.saveBtnFull, { backgroundColor: canSave ? tagColor : colors.muted }]}
             onPress={handleSave}
             disabled={!canSave || saving}
+            accessibilityRole="button"
+            accessibilityLabel={saving ? "Saving entry" : "Save entry"}
+            accessibilityState={{ disabled: !canSave || saving }}
           >
             {saving
               ? <ActivityIndicator size="small" color="#000" />
@@ -452,14 +496,22 @@ export default function AddEntryScreen() {
             <View style={{ gap: 10 }}>
               <View>
                 <Image source={{ uri: photoUri }} style={styles.photoPreview} contentFit="cover" />
-                <Pressable style={styles.removePhoto} onPress={() => setPhotoUri(null)}>
-                  <Feather name="x" size={14} color="#fff" />
+                <Pressable
+                  style={styles.removePhoto}
+                  onPress={() => setPhotoUri(null)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Remove photo"
+                >
+                  <Feather name="x" size={14} color="#fff" accessible={false} />
                 </Pressable>
               </View>
               <Pressable
                 style={[styles.ocrBtn, { backgroundColor: colors.muted, borderColor: colors.border }]}
                 onPress={handleOcrPhoto}
                 disabled={ocrBusy}
+                accessibilityRole="button"
+                accessibilityLabel={ocrBusy ? "Extracting text from photo" : "Extract text from photo"}
+                accessibilityState={{ disabled: ocrBusy }}
               >
                 {ocrBusy ? (
                   <ActivityIndicator size="small" color={colors.mutedForeground} />
@@ -473,12 +525,22 @@ export default function AddEntryScreen() {
             </View>
           ) : (
             <View style={styles.photoRow}>
-              <Pressable style={[styles.photoBtn, { backgroundColor: colors.muted }]} onPress={handlePickPhoto}>
-                <Feather name="image" size={15} color={colors.mutedForeground} />
+              <Pressable
+                style={[styles.photoBtn, { backgroundColor: colors.muted }]}
+                onPress={handlePickPhoto}
+                accessibilityRole="button"
+                accessibilityLabel="Choose photo from gallery"
+              >
+                <Feather name="image" size={15} color={colors.mutedForeground} accessible={false} />
                 <Text style={[styles.photoBtnText, { color: colors.mutedForeground }]}>{t.add.gallery}</Text>
               </Pressable>
-              <Pressable style={[styles.photoBtn, { backgroundColor: colors.muted }]} onPress={handleCameraPhoto}>
-                <Feather name="camera" size={15} color={colors.mutedForeground} />
+              <Pressable
+                style={[styles.photoBtn, { backgroundColor: colors.muted }]}
+                onPress={handleCameraPhoto}
+                accessibilityRole="button"
+                accessibilityLabel="Take a photo with camera"
+              >
+                <Feather name="camera" size={15} color={colors.mutedForeground} accessible={false} />
                 <Text style={[styles.photoBtnText, { color: colors.mutedForeground }]}>{t.add.camera}</Text>
               </Pressable>
             </View>
@@ -492,8 +554,13 @@ export default function AddEntryScreen() {
               <Text numberOfLines={1} style={[styles.geoChipText, { color: colors.foreground }]}>
                 {geo.place ?? `${geo.latitude.toFixed(4)}, ${geo.longitude.toFixed(4)}`}
               </Text>
-              <Pressable onPress={() => setGeo(null)} hitSlop={8}>
-                <Feather name="x" size={14} color={colors.mutedForeground} />
+              <Pressable
+                onPress={() => setGeo(null)}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Remove location"
+              >
+                <Feather name="x" size={14} color={colors.mutedForeground} accessible={false} />
               </Pressable>
             </View>
           ) : showPlaceInput ? (
@@ -515,30 +582,45 @@ export default function AddEntryScreen() {
                 hitSlop={8}
                 disabled={capturingGeo}
                 style={[styles.gpsBtn, { backgroundColor: tagColor + "20" }]}
+                accessibilityRole="button"
+                accessibilityLabel={capturingGeo ? "Getting GPS location" : "Use GPS location"}
+                accessibilityState={{ disabled: capturingGeo }}
               >
                 {capturingGeo
                   ? <ActivityIndicator size="small" color={tagColor} />
                   : <Feather name="navigation" size={13} color={tagColor} />
                 }
               </Pressable>
-              <Pressable onPress={() => { setShowPlaceInput(false); setManualPlace(""); }} hitSlop={8}>
-                <Feather name="x" size={15} color={colors.mutedForeground} />
+              <Pressable
+                onPress={() => { setShowPlaceInput(false); setManualPlace(""); }}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Cancel place input"
+              >
+                <Feather name="x" size={15} color={colors.mutedForeground} accessible={false} />
               </Pressable>
             </View>
           ) : manualPlace.trim() ? (
             <View style={[styles.geoChip, { borderColor: tagColor + "40", backgroundColor: tagColor + "12" }]}>
               <Feather name="map-pin" size={13} color={tagColor} />
               <Text numberOfLines={1} style={[styles.geoChipText, { color: colors.foreground }]}>{manualPlace}</Text>
-              <Pressable onPress={() => { setManualPlace(""); setShowPlaceInput(true); }} hitSlop={8}>
-                <Feather name="x" size={14} color={colors.mutedForeground} />
+              <Pressable
+                onPress={() => { setManualPlace(""); setShowPlaceInput(true); }}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Clear manual place"
+              >
+                <Feather name="x" size={14} color={colors.mutedForeground} accessible={false} />
               </Pressable>
             </View>
           ) : (
             <Pressable
               onPress={() => setShowPlaceInput(true)}
               style={[styles.photoBtn, { backgroundColor: colors.muted, alignSelf: "flex-start" }]}
+              accessibilityRole="button"
+              accessibilityLabel="Add a place to this entry"
             >
-              <Feather name="map-pin" size={15} color={colors.mutedForeground} />
+              <Feather name="map-pin" size={15} color={colors.mutedForeground} accessible={false} />
               <Text style={[styles.photoBtnText, { color: colors.mutedForeground }]}>Add place</Text>
             </Pressable>
           )}
@@ -555,8 +637,13 @@ export default function AddEntryScreen() {
             <View style={[styles.geoChip, { borderColor: tagColor + "40", backgroundColor: tagColor + "12" }]}>
               <Feather name="mic" size={13} color={tagColor} />
               <Text style={[styles.geoChipText, { color: colors.foreground }]}>Voice memo attached</Text>
-              <Pressable onPress={() => setAudioUri(null)} hitSlop={8}>
-                <Feather name="x" size={14} color={colors.mutedForeground} />
+              <Pressable
+                onPress={() => setAudioUri(null)}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Remove voice memo"
+              >
+                <Feather name="x" size={14} color={colors.mutedForeground} accessible={false} />
               </Pressable>
             </View>
           )}

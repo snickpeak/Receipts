@@ -74,13 +74,23 @@ export function DailyPromptCard() {
           <Text style={[styles.label, { color: tagColor }]}>TODAY'S PROMPT · {prompt.tag.toUpperCase()}</Text>
         </View>
         <View style={styles.topActions}>
-          <Pressable onPress={handleShuffle} hitSlop={10}>
-            <Animated.View style={spinStyle}>
+          <Pressable
+            onPress={handleShuffle}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="Show next prompt"
+          >
+            <Animated.View style={spinStyle} accessible={false}>
               <Feather name="refresh-cw" size={13} color={colors.mutedForeground} />
             </Animated.View>
           </Pressable>
-          <Pressable onPress={handleDismiss} hitSlop={10}>
-            <Feather name="x" size={14} color={colors.mutedForeground} />
+          <Pressable
+            onPress={handleDismiss}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss prompt"
+          >
+            <Feather name="x" size={14} color={colors.mutedForeground} accessible={false} />
           </Pressable>
         </View>
       </View>
@@ -90,10 +100,13 @@ export function DailyPromptCard() {
       <Pressable
         onPress={handleWrite}
         style={({ pressed }) => [styles.writeBtn, { backgroundColor: tagColor, opacity: pressed ? 0.8 : 1 }]}
+        accessibilityRole="button"
+        accessibilityLabel={`Write about: ${prompt.text}`}
+        accessibilityHint="Opens the new entry screen with this prompt"
       >
-        <Feather name={TAG_ICONS[prompt.tag] as any} size={13} color="#000" />
-        <Text style={styles.writeBtnText}>Write about this</Text>
-        <Feather name="arrow-right" size={13} color="#000" />
+        <Feather name={TAG_ICONS[prompt.tag] as any} size={13} color="#000" accessible={false} />
+        <Text style={styles.writeBtnText} accessible={false}>Write about this</Text>
+        <Feather name="arrow-right" size={13} color="#000" accessible={false} />
       </Pressable>
     </LinearGradient>
   );

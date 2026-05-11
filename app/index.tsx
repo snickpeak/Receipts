@@ -114,15 +114,21 @@ export default function Index() {
     >
       <AnimatedContent delay={0} style={styles.logoWrapOuter}>
         <LinearGradient
+          accessible={false}
           colors={["#a855f730", "transparent"]}
           style={styles.logoWrap}
         >
-          <Feather name="layers" size={34} color="#a855f7" />
+          <Feather name="layers" size={34} color="#a855f7" accessible={false} />
         </LinearGradient>
       </AnimatedContent>
 
       {/* Handwritten letter-by-letter brand name */}
-      <View style={styles.brandRow}>
+      <View
+        style={styles.brandRow}
+        accessible={true}
+        accessibilityLabel="Receipts"
+        accessibilityRole="header"
+      >
         {BRAND.split("").map((char, i) => (
           <AnimatedLetter
             key={i}
@@ -147,8 +153,10 @@ export default function Index() {
           style={styles.primaryBtn}
           haptic="medium"
           onPress={() => router.replace("/(tabs)")}
+          accessibilityRole="button"
+          accessibilityLabel="Open app preview"
         >
-          <Text style={[styles.primaryBtnText, { color: "#fff" }]}>
+          <Text style={[styles.primaryBtnText, { color: "#fff" }]} accessible={false}>
             Open preview
           </Text>
         </PressableScale>
@@ -156,8 +164,10 @@ export default function Index() {
           style={styles.secondaryBtn}
           scaleTo={0.96}
           onPress={() => router.replace("/(auth)/sign-in")}
+          accessibilityRole="button"
+          accessibilityLabel="Go to sign in"
         >
-          <Text style={[styles.secondaryBtnText, { color: "#a855f7" }]}>
+          <Text style={[styles.secondaryBtnText, { color: "#a855f7" }]} accessible={false}>
             Go to sign in
           </Text>
         </PressableScale>
