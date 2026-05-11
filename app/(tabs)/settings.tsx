@@ -187,7 +187,7 @@ export default function SettingsScreen() {
   const t = useTranslation();
   const insets = useSafeAreaInsets();
   const { settings, updateSettings, loaded } = useSettings();
-  const { entries, trashedEntries, importEntries, deleteAllEntries, clearLocalEntries, renameTagEverywhere } = useEntries();
+  const { entries, trashedEntries, importEntries, deleteAllEntries, clearLocalEntries, renameTagEverywhere, localOnlyMode, pendingSyncCount } = useEntries();
   const totalWords = useMemo(() => totalWordsAcross(entries), [entries]);
   const TIMEZONES = useMemo<string[]>(() => {
     try { return (Intl as any).supportedValuesOf("timeZone") as string[]; } catch {
@@ -336,15 +336,24 @@ export default function SettingsScreen() {
 
   // ── Sign out ────────────────────────────────────────────────────────────────
   const handleSignOut = async () => {
+    const hasBackend = !!getRestApiBase();
     const doSignOut = async () => {
-      await clearLocalEntries();
+      // Only wipe local entries if cloud sync is active and all entries are
+      // synced — otherwise data would be permanently lost with no way to
+      // restore it on the next sign-in.
+      if (hasBackend && !localOnlyMode && pendingSyncCount === 0) {
+        await clearLocalEntries();
+      }
       await AsyncStorage.removeItem("receipts_guest_mode_v1");
       await clearBiometricCredentials();
       await signOut();
       router.replace("/(auth)/sign-in" as any);
     };
     if (Platform.OS === "web") { await doSignOut(); return; }
-    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+    const subtitle = hasBackend && !localOnlyMode
+      ? "Are you sure you want to sign out?"
+      : "Your entries are saved on this device and will be here when you sign back in.";
+    Alert.alert("Sign Out", subtitle, [
       { text: "Cancel", style: "cancel" },
       { text: "Sign Out", style: "destructive", onPress: doSignOut },
     ]);
