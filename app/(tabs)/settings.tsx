@@ -616,20 +616,6 @@ export default function SettingsScreen() {
                 borderTop
               />
               <SettingRow
-                icon="shield"
-                label="Two-Factor Authentication"
-                sublabel={(() => {
-                  const hasTOTP = user.totpEnabled;
-                  const hasSMS = user.phoneNumbers?.some((p) => p.reservedForSecondFactor);
-                  if (hasTOTP && hasSMS) return "Authenticator app + SMS";
-                  if (hasTOTP) return "Authenticator app enabled";
-                  if (hasSMS) return "SMS text message enabled";
-                  return "Add an extra layer of sign-in security";
-                })()}
-                onPress={() => router.push("/two-factor" as any)}
-                borderTop
-              />
-              <SettingRow
                 icon="log-out"
                 label="Sign Out"
                 sublabel="Sign out of your account on this device"
