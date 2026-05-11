@@ -76,7 +76,6 @@ const proxyUrl = process.env.EXPO_PUBLIC_CLERK_PROXY_URL?.trim() || undefined;
 
 function LockGate({ children }: { children: React.ReactNode }) {
   const { settings, loaded } = useSettings();
-  const { clearLocalEntries } = useEntries();
   const [unlocked, setUnlocked] = useState(false);
   const [decoyMode, setDecoyMode] = useState(false);
   const [guestMode, setGuestMode] = useState(false);
@@ -98,8 +97,12 @@ function LockGate({ children }: { children: React.ReactNode }) {
         backgroundedAt.current = Date.now();
         if (settings.screenshotProtection) setShowPrivacyOverlay(true);
         if (guestMode) {
-          void clearLocalEntries();
+          // Exit guest mode and force re-auth — do NOT wipe entries here.
+          // clearLocalEntries() would permanently destroy the real user's data
+          // since entries live only in local storage when no backend is set up.
           void AsyncStorage.removeItem(guestKey);
+          setGuestMode(false);
+          setUnlocked(false);
         }
       } else if (nextState === "active") {
         setShowPrivacyOverlay(false);
@@ -115,7 +118,7 @@ function LockGate({ children }: { children: React.ReactNode }) {
       }
     });
     return () => sub.remove();
-  }, [clearLocalEntries, guestMode, unlocked, settings.lockEnabled, settings.autoLockTimeout, settings.screenshotProtection]);
+  }, [guestMode, unlocked, settings.lockEnabled, settings.autoLockTimeout, settings.screenshotProtection]);
 
   const lock = useCallback(() => {
     setUnlocked(false);
