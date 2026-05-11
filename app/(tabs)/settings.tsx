@@ -43,7 +43,7 @@ import { useLocaleFont } from "@/hooks/useLocaleFont";
 import { useTranslation } from "@/hooks/useTranslation";
 import { SUPPORTED_LANGUAGES } from "@/i18n/translations";
 import { SUPPORTED_CURRENCIES } from "@/i18n/currencies";
-import { getRestApiBase, warnMissingNativeDomainOnce } from "@/lib/env";
+import { getRestApiBase, getShareWebBase, warnMissingNativeDomainOnce } from "@/lib/env";
 import { composeHomeLocationLine } from "@/lib/photonGeocode";
 
 const AUTO_LOCK_OPTIONS = [
@@ -1122,6 +1122,27 @@ export default function SettingsScreen() {
               }}
             />
           ))}
+        </Section>
+
+        {/* Legal */}
+        <Section title="LEGAL" delay={300}>
+          <SettingRow
+            icon="file-text"
+            label="Privacy Policy"
+            sublabel="How we handle your data"
+            onPress={() => {
+              const base = getShareWebBase();
+              const url = base ? `${base}/privacy` : "https://receipts.app/privacy";
+              Linking.openURL(url).catch(() => {});
+            }}
+          />
+          <SettingRow
+            icon="mail"
+            label="Support"
+            sublabel="Get help or send feedback"
+            onPress={() => { Linking.openURL("mailto:support@receipts.app").catch(() => {}); }}
+            borderTop
+          />
         </Section>
 
         {/* Danger zone */}

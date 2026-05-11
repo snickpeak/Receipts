@@ -15,6 +15,7 @@ const path = require("path");
 
 const STATIC_ROOT = path.resolve(__dirname, "..", "static-build");
 const TEMPLATE_PATH = path.resolve(__dirname, "templates", "landing-page.html");
+const PRIVACY_TEMPLATE_PATH = path.resolve(__dirname, "templates", "privacy-policy.html");
 const basePath = (process.env.BASE_PATH || "/").replace(/\/+$/, "");
 
 const MIME_TYPES = {
@@ -137,6 +138,18 @@ const server = http.createServer((req, res) => {
 
   if (basePath && pathname.startsWith(basePath)) {
     pathname = pathname.slice(basePath.length) || "/";
+  }
+
+  if (pathname === "/privacy") {
+    if (fs.existsSync(PRIVACY_TEMPLATE_PATH)) {
+      const content = fs.readFileSync(PRIVACY_TEMPLATE_PATH, "utf-8");
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end(content);
+    } else {
+      res.writeHead(404);
+      res.end("Not Found");
+    }
+    return;
   }
 
   if (pathname === "/" || pathname === "/manifest") {
