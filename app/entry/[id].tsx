@@ -25,7 +25,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { EntryShareCommentsPanel } from "@/components/EntryShareCommentsPanel";
 import { AnimatedIconBounce } from "@/components/animations/AnimatedIconBounce";
 import { PhotoHeroOverlay } from "@/components/PhotoHeroOverlay";
 import { PinchZoomImageModal } from "@/components/PinchZoomImageModal";
@@ -808,15 +807,6 @@ export default function EntryDetailScreen() {
             </View>
           )}
 
-          {/* Public link, privacy, comments (owner) */}
-          {!editing && !entry.trashedAt && (
-            <EntryShareCommentsPanel
-              entry={entry}
-              online={online}
-              tagColor={tagColor}
-              onPatch={(u) => updateEntry(entry.id, u)}
-            />
-          )}
 
           {/* Share this entry */}
           {!editing && (

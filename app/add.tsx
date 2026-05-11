@@ -496,14 +496,6 @@ export default function AddEntryScreen() {
                 <Feather name="x" size={14} color={colors.mutedForeground} />
               </Pressable>
             </View>
-          ) : manualPlace.trim() ? (
-            <View style={[styles.geoChip, { borderColor: tagColor + "40", backgroundColor: tagColor + "12" }]}>
-              <Feather name="map-pin" size={13} color={tagColor} />
-              <Text numberOfLines={1} style={[styles.geoChipText, { color: colors.foreground }]}>{manualPlace}</Text>
-              <Pressable onPress={() => setManualPlace("")} hitSlop={8}>
-                <Feather name="x" size={14} color={colors.mutedForeground} />
-              </Pressable>
-            </View>
           ) : showPlaceInput ? (
             <View style={[styles.placeRow, { backgroundColor: colors.muted, borderColor: colors.border }]}>
               <Feather name="map-pin" size={14} color={colors.mutedForeground} />
@@ -514,8 +506,9 @@ export default function AddEntryScreen() {
                 value={manualPlace}
                 onChangeText={setManualPlace}
                 returnKeyType="done"
-                onSubmitEditing={() => { if (!manualPlace.trim()) setShowPlaceInput(false); }}
+                onSubmitEditing={() => setShowPlaceInput(false)}
                 autoFocus
+                inputAccessoryViewID={Platform.OS === "ios" ? "add-entry-toolbar" : undefined}
               />
               <Pressable
                 onPress={() => { setShowPlaceInput(false); captureGeo(); }}
@@ -530,6 +523,14 @@ export default function AddEntryScreen() {
               </Pressable>
               <Pressable onPress={() => { setShowPlaceInput(false); setManualPlace(""); }} hitSlop={8}>
                 <Feather name="x" size={15} color={colors.mutedForeground} />
+              </Pressable>
+            </View>
+          ) : manualPlace.trim() ? (
+            <View style={[styles.geoChip, { borderColor: tagColor + "40", backgroundColor: tagColor + "12" }]}>
+              <Feather name="map-pin" size={13} color={tagColor} />
+              <Text numberOfLines={1} style={[styles.geoChipText, { color: colors.foreground }]}>{manualPlace}</Text>
+              <Pressable onPress={() => { setManualPlace(""); setShowPlaceInput(true); }} hitSlop={8}>
+                <Feather name="x" size={14} color={colors.mutedForeground} />
               </Pressable>
             </View>
           ) : (
