@@ -14,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
+import { AnimatedFireEmoji } from "@/components/AnimatedFireEmoji";
 import { FadeInView } from "@/components/animations/FadeInView";
 import { DAILY_PROMPTS, getDailyBaseIndex } from "@/constants/prompts";
 import { useEntries } from "@/context/EntriesContext";
@@ -163,9 +164,14 @@ export function HeroSection() {
             <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
 
             <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.foreground }]}>
-                {streak.current > 0 ? `🔥 ${streak.current}` : "—"}
-              </Text>
+              {streak.current > 0 ? (
+                <View style={styles.streakRow}>
+                  <AnimatedFireEmoji size={17} />
+                  <Text style={[styles.statNumber, { color: colors.foreground }]}>{streak.current}</Text>
+                </View>
+              ) : (
+                <Text style={[styles.statNumber, { color: colors.foreground }]}>—</Text>
+              )}
               <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>
                 {streak.current === 1 ? "day" : "days"}
               </Text>
@@ -375,6 +381,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+  },
+  streakRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
   },
   topTagDot: {
     width: 8,

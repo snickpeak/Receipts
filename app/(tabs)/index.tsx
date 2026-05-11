@@ -35,6 +35,7 @@ import { ReorderPinsModal } from "@/components/ReorderPinsModal";
 import { DailyPromptCard } from "@/components/DailyPromptCard";
 import { HeroSection } from "@/components/HeroSection";
 import { AnimatedListItem, FadeInView } from "@/components/animations";
+import { AnimatedFireEmoji } from "@/components/AnimatedFireEmoji";
 import { AnimatedIconBounce } from "@/components/animations/AnimatedIconBounce";
 import { useEntries, type Entry, type Tag } from "@/context/EntriesContext";
 import { usePhotoHero } from "@/context/PhotoHeroContext";
@@ -428,7 +429,7 @@ export default function TimelineScreen() {
                 accessibilityLabel={`${streak.current}-day streak`}
                 accessibilityHint="Tap to view your streak digest"
               >
-                <Text style={styles.streakEmoji} accessible={false}>🔥</Text>
+                <AnimatedFireEmoji size={15} accessible={false} />
                 <Text style={[styles.streakText, { color: "#f59e0b" }]} accessible={false}>{streak.current}</Text>
               </Pressable>
             )}
