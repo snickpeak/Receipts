@@ -131,7 +131,12 @@ function EntryCardInner({
   photoMeasureRef?: React.RefObject<View | null>;
 }) {
   const colors = useColors();
+  const t = useTranslation();
   const isLocked = entry.locked === true;
+  const dateLabelMap: Record<string, string> = {
+    __today__: t.common.today,
+    __yesterday__: t.common.yesterday,
+  };
   return (
     <LinearGradient
       colors={[tagColor + "18", tagColor + "04", "transparent"]}
@@ -148,7 +153,7 @@ function EntryCardInner({
             {isLocked && <Feather name="lock" size={10} color={colors.mutedForeground} />}
           </View>
           <View style={cardStyles.rightRow}>
-            <Text style={[cardStyles.dateLabel, { color: colors.mutedForeground }]}>{formatDate(entry.createdAt)}</Text>
+            <Text style={[cardStyles.dateLabel, { color: colors.mutedForeground }]}>{dateLabelMap[formatDate(entry.createdAt)] ?? formatDate(entry.createdAt)}</Text>
             <AnimatedIconBounce onPress={onStar}>
               <Feather name="star" size={14} color={entry.starred ? "#f59e0b" : colors.mutedForeground} />
             </AnimatedIconBounce>
