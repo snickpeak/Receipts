@@ -1125,11 +1125,7 @@ export default function SettingsScreen() {
             icon="file-text"
             label="Privacy Policy"
             sublabel="How we handle your data"
-            onPress={() => {
-              const base = getShareWebBase();
-              const url = base ? `${base}/privacy` : "https://receipts.app/privacy";
-              Linking.openURL(url).catch(() => {});
-            }}
+            onPress={() => router.push("/privacy-policy" as any)}
           />
           <SettingRow
             icon="mail"
