@@ -71,6 +71,7 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [oauthLoading, setOauthLoading] = useState(false);
   const [oauthError, setOauthError] = useState("");
+  const [pendingVerification, setPendingVerification] = useState(false);
 
   useEffect(() => {
     if (Platform.OS !== "android") return;
@@ -101,7 +102,12 @@ export default function SignUpScreen() {
         else setEmailError(msg);
         return;
       }
-      await signUp.verifications.sendEmailCode();
+      const { error: sendError } = await signUp.verifications.sendEmailCode();
+      if (sendError) {
+        setEmailError(sendError.message ?? "Could not send verification email. Please try again.");
+        return;
+      }
+      setPendingVerification(true);
     } catch (err: any) {
       setEmailError(err?.errors?.[0]?.message ?? err?.message ?? "Sign up failed. Please try again.");
     } finally {
@@ -115,9 +121,7 @@ export default function SignUpScreen() {
     try {
       const { error } = await signUp.verifications.verifyEmailCode({ code: verifyCode });
       if (error) { setCodeError(error.message ?? "Invalid code. Please try again."); return; }
-      if (signUp.status === "complete") {
-        await signUp.finalize({ navigate: () => router.replace("/(tabs)" as any) });
-      }
+      await signUp.finalize({ navigate: () => router.replace("/(tabs)" as any) });
     } catch (err: any) {
       setCodeError(err?.errors?.[0]?.message ?? "Invalid code. Please try again.");
     } finally {
@@ -219,7 +223,7 @@ export default function SignUpScreen() {
 
   const isLoading = loading || fetchStatus === "fetching" || oauthLoading;
 
-  if (signUp.status === "missing_requirements" && signUp.unverifiedFields.includes("email_address") && signUp.missingFields.length === 0) {
+  if (pendingVerification) {
     return (
       <View style={[styles.container, { backgroundColor: c.bg, paddingTop: topInset + 20, paddingBottom: bottomInset + 20 }]}>
         <LinearGradient colors={["#a855f730", "transparent"]} style={styles.logoWrap}>

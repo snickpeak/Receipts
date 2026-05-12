@@ -105,6 +105,7 @@ export default function SignInScreen() {
   const [useBackupCode, setUseBackupCode] = useState(false);
   const [backupCode, setBackupCode] = useState("");
 
+  const [needsMFA, setNeedsMFA] = useState(false);
   const [mfaMethod, setMfaMethod] = useState<"totp" | "sms">("totp");
   const [smsStep, setSmsStep] = useState<"send" | "code">("send");
   const [smsCode, setSmsCode] = useState("");
@@ -158,7 +159,9 @@ export default function SignInScreen() {
     setSignInError("");
     const { error } = await signIn.password({ emailAddress: email, password });
     if (error) { setSignInError(error.message ?? "Sign in failed. Please try again."); return; }
-    if (signIn.status === "complete") {
+    if (signIn.status === "needs_second_factor") {
+      setNeedsMFA(true);
+    } else {
       if (biometricAvail && !storedEmail) {
         setPendingEmail(email);
         setPendingPassword(password);
@@ -184,7 +187,9 @@ export default function SignInScreen() {
         setEmail(creds.email);
         return;
       }
-      if (signIn.status === "complete") {
+      if (signIn.status === "needs_second_factor") {
+        setNeedsMFA(true);
+      } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         await finalize();
       }
@@ -465,7 +470,7 @@ export default function SignInScreen() {
   const showApple = Platform.OS === "ios" || Platform.OS === "web";
   const sharedPadding = { paddingTop: topInset + 20, paddingBottom: bottomInset + 20 };
 
-  if (signIn.status === "needs_second_factor") {
+  if (needsMFA) {
     const factors = signIn.supportedSecondFactors ?? [];
     const hasTOTP = factors.some((f) => f.strategy === "totp");
     const hasSMS = factors.some((f) => f.strategy === "phone_code");
