@@ -14,6 +14,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PressableScale } from "@/components/PressableScale";
+import { HandwritingReceipts, HANDWRITING_DONE } from "@/components/HandwritingReceipts";
 import { useColors } from "@/hooks/useColors";
 import { useSettings } from "@/context/SettingsContext";
 
@@ -30,56 +31,15 @@ const TAGLINES = [
   "Because moments are worth more when you keep them.",
 ];
 
-const BRAND = "RECEIPTS";
-const LETTER_DELAY = 110;
-const LETTERS_DONE = BRAND.length * LETTER_DELAY + 200;
-
-// Pre-computed per-letter organic offsets (stable across renders)
-const LETTER_ROTATIONS = [-8, 6, -4, 9, -7, 5, -3, 8];
-const LETTER_Y_OFFSETS = [14, 10, 16, 12, 18, 10, 14, 12];
-
-function AnimatedLetter({
-  char,
-  index,
-  color,
+function AnimatedContent({
+  delay,
+  children,
+  style,
 }: {
-  char: string;
-  index: number;
-  color: string;
+  delay: number;
+  children: React.ReactNode;
+  style?: object;
 }) {
-  const { settings } = useSettings();
-  const rm = settings.reduceMotion;
-  const opacity = useSharedValue(rm ? 1 : 0);
-  const translateY = useSharedValue(rm ? 0 : (LETTER_Y_OFFSETS[index] ?? 12));
-  const scale = useSharedValue(rm ? 1 : 0.3);
-  const rotate = useSharedValue(rm ? 0 : (LETTER_ROTATIONS[index] ?? 0));
-
-  useEffect(() => {
-    if (rm) return;
-    const d = index * LETTER_DELAY;
-    opacity.value = withDelay(d, withTiming(1, { duration: 160, reduceMotion: ReduceMotion.Never }));
-    translateY.value = withDelay(d, withSpring(0, { damping: 10, stiffness: 180, reduceMotion: ReduceMotion.Never }));
-    scale.value = withDelay(d, withSpring(1, { damping: 9, stiffness: 200, reduceMotion: ReduceMotion.Never }));
-    rotate.value = withDelay(d, withSpring(0, { damping: 8, stiffness: 140, reduceMotion: ReduceMotion.Never }));
-  }, [rm]);
-
-  const style = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [
-      { translateY: translateY.value },
-      { scale: scale.value },
-      { rotate: `${rotate.value}deg` },
-    ],
-  }));
-
-  return (
-    <Animated.Text style={[styles.brandLetter, { color }, style]}>
-      {char}
-    </Animated.Text>
-  );
-}
-
-function AnimatedContent({ delay, children, style }: { delay: number; children: React.ReactNode; style?: object }) {
   const { settings } = useSettings();
   const rm = settings.reduceMotion;
   const opacity = useSharedValue(rm ? 1 : 0);
@@ -87,8 +47,14 @@ function AnimatedContent({ delay, children, style }: { delay: number; children: 
 
   useEffect(() => {
     if (rm) return;
-    opacity.value = withDelay(delay, withTiming(1, { duration: 400, reduceMotion: ReduceMotion.Never }));
-    translateY.value = withDelay(delay, withSpring(0, { damping: 14, stiffness: 160, reduceMotion: ReduceMotion.Never }));
+    opacity.value = withDelay(
+      delay,
+      withTiming(1, { duration: 400, reduceMotion: ReduceMotion.Never }),
+    );
+    translateY.value = withDelay(
+      delay,
+      withSpring(0, { damping: 14, stiffness: 160, reduceMotion: ReduceMotion.Never }),
+    );
   }, [rm]);
 
   const animStyle = useAnimatedStyle(() => ({
@@ -120,6 +86,10 @@ export default function Index() {
         },
       ]}
     >
+      {/* Top spacer — smaller to raise content above true center */}
+      <View style={{ flex: 1 }} />
+
+      {/* Icon */}
       <AnimatedContent delay={0} style={styles.logoWrapOuter}>
         <LinearGradient
           accessible={false}
@@ -130,24 +100,12 @@ export default function Index() {
         </LinearGradient>
       </AnimatedContent>
 
-      {/* Handwritten letter-by-letter brand name */}
-      <View
-        style={styles.brandRow}
-        accessible={true}
-        accessibilityLabel="Receipts"
-        accessibilityRole="header"
-      >
-        {BRAND.split("").map((char, i) => (
-          <AnimatedLetter
-            key={i}
-            char={char}
-            index={i}
-            color={colors.foreground}
-          />
-        ))}
+      {/* SVG stroke-dashoffset handwriting animation */}
+      <View style={styles.brandRow}>
+        <HandwritingReceipts color={colors.foreground} />
       </View>
 
-      <AnimatedContent delay={LETTERS_DONE} style={styles.textBlock}>
+      <AnimatedContent delay={HANDWRITING_DONE} style={styles.textBlock}>
         <Text style={[styles.title, { color: colors.foreground }]}>
           {tagline}
         </Text>
@@ -156,7 +114,7 @@ export default function Index() {
         </Text>
       </AnimatedContent>
 
-      <AnimatedContent delay={LETTERS_DONE + 180} style={styles.btnBlock}>
+      <AnimatedContent delay={HANDWRITING_DONE + 180} style={styles.btnBlock}>
         <PressableScale
           style={styles.primaryBtn}
           haptic="medium"
@@ -164,7 +122,10 @@ export default function Index() {
           accessibilityRole="button"
           accessibilityLabel="Open app preview"
         >
-          <Text style={[styles.primaryBtnText, { color: "#fff" }]} accessible={false}>
+          <Text
+            style={[styles.primaryBtnText, { color: "#fff" }]}
+            accessible={false}
+          >
             Open preview
           </Text>
         </PressableScale>
@@ -175,11 +136,17 @@ export default function Index() {
           accessibilityRole="button"
           accessibilityLabel="Go to sign in"
         >
-          <Text style={[styles.secondaryBtnText, { color: "#a855f7" }]} accessible={false}>
+          <Text
+            style={[styles.secondaryBtnText, { color: "#a855f7" }]}
+            accessible={false}
+          >
             Go to sign in
           </Text>
         </PressableScale>
       </AnimatedContent>
+
+      {/* Bottom spacer — larger to shift content upward (~3 lines) */}
+      <View style={{ flex: 1.45 }} />
     </View>
   );
 }
@@ -188,7 +155,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
     paddingHorizontal: 28,
     gap: 10,
   },
@@ -203,15 +169,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   brandRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 1,
+    width: "100%",
     marginBottom: 4,
-  },
-  brandLetter: {
-    fontSize: 30,
-    fontFamily: "Inter_700Bold",
-    letterSpacing: 5,
   },
   textBlock: {
     alignItems: "center",
