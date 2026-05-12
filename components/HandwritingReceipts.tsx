@@ -12,8 +12,8 @@ import { View, StyleSheet } from "react-native";
 import { useSettings } from "@/context/SettingsContext";
 
 const LETTERS = ["R", "E", "C", "E", "I", "P", "T", "S"];
-const STAGGER = 80;
-const LETTER_DUR = 350;
+const STAGGER = 70;
+const LETTER_DUR = 420;
 export const HANDWRITING_DONE = STAGGER * (LETTERS.length - 1) + LETTER_DUR + 200;
 
 function AnimatedLetter({
@@ -28,7 +28,7 @@ function AnimatedLetter({
   reduceMotion: boolean;
 }) {
   const opacity = useSharedValue(reduceMotion ? 1 : 0);
-  const translateY = useSharedValue(reduceMotion ? 0 : 10);
+  const translateY = useSharedValue(reduceMotion ? 0 : 18);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -40,7 +40,7 @@ function AnimatedLetter({
       delay,
       withTiming(1, {
         duration: LETTER_DUR,
-        easing: Easing.out(Easing.cubic),
+        easing: Easing.out(Easing.exp),
         reduceMotion: ReduceMotion.Never,
       }),
     );
@@ -48,7 +48,7 @@ function AnimatedLetter({
       delay,
       withTiming(0, {
         duration: LETTER_DUR,
-        easing: Easing.out(Easing.cubic),
+        easing: Easing.out(Easing.exp),
         reduceMotion: ReduceMotion.Never,
       }),
     );
@@ -97,9 +97,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   letter: {
-    fontSize: 48,
-    fontFamily: "Inter_400Regular",
-    letterSpacing: 6,
+    fontSize: 44,
+    fontFamily: "Inter_500Medium",
+    letterSpacing: 10,
     includeFontPadding: false,
   },
 });
