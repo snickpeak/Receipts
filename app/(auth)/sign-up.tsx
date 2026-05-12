@@ -33,6 +33,10 @@ export default function SignUpScreen() {
   const clerk = useClerk();
   const { signIn } = useSignIn();
   const { signUp, errors, fetchStatus } = useSignUp();
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [codeError, setCodeError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { startSSOFlow } = useSSO();
   const legacyWebSignIn =
     "client" in clerk && clerk.client ? clerk.client.signIn : undefined;
@@ -85,15 +89,39 @@ export default function SignUpScreen() {
   const logoAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: logoScale.value }] }));
 
   const handleSubmit = async () => {
-    const { error } = await signUp.password({ emailAddress: email, password });
-    if (error) return;
-    await signUp.verifications.sendEmailCode();
+    setLoading(true);
+    setEmailError("");
+    setPasswordError("");
+    try {
+      const { error } = await signUp.password({ emailAddress: email, password });
+      if (error) {
+        const msg = error.message ?? "Sign up failed. Please try again.";
+        if (error.code?.includes("email")) setEmailError(msg);
+        else if (error.code?.includes("password")) setPasswordError(msg);
+        else setEmailError(msg);
+        return;
+      }
+      await signUp.verifications.sendEmailCode();
+    } catch (err: any) {
+      setEmailError(err?.errors?.[0]?.message ?? err?.message ?? "Sign up failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerify = async () => {
-    await signUp.verifications.verifyEmailCode({ code: verifyCode });
-    if (signUp.status === "complete") {
-      await signUp.finalize({ navigate: () => router.replace("/(tabs)" as any) });
+    setLoading(true);
+    setCodeError("");
+    try {
+      const { error } = await signUp.verifications.verifyEmailCode({ code: verifyCode });
+      if (error) { setCodeError(error.message ?? "Invalid code. Please try again."); return; }
+      if (signUp.status === "complete") {
+        await signUp.finalize({ navigate: () => router.replace("/(tabs)" as any) });
+      }
+    } catch (err: any) {
+      setCodeError(err?.errors?.[0]?.message ?? "Invalid code. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,7 +217,7 @@ export default function SignUpScreen() {
     router.replace("/(tabs)" as any);
   };
 
-  const isLoading = fetchStatus === "fetching" || oauthLoading;
+  const isLoading = loading || fetchStatus === "fetching" || oauthLoading;
 
   if (signUp.status === "missing_requirements" && signUp.unverifiedFields.includes("email_address") && signUp.missingFields.length === 0) {
     return (
@@ -210,9 +238,9 @@ export default function SignUpScreen() {
           textAlign="center"
           autoFocus
         />
-        {errors.fields.code && <Text style={styles.errorText}>{errors.fields.code.message}</Text>}
-        <Pressable style={[styles.primaryBtn, { opacity: verifyCode.length < 6 || isLoading ? 0.5 : 1 }]} onPress={handleVerify} disabled={verifyCode.length < 6 || isLoading}>
-          {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Verify email</Text>}
+        {codeError ? <Text style={styles.errorText}>{codeError}</Text> : null}
+        <Pressable style={[styles.primaryBtn, { opacity: verifyCode.length < 6 || loading ? 0.5 : 1 }]} onPress={handleVerify} disabled={verifyCode.length < 6 || loading}>
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Verify email</Text>}
         </Pressable>
         <Pressable onPress={() => signUp.verifications.sendEmailCode()} style={styles.textLink}>
           <Text style={[styles.textLinkText, { color: c.textMuted }]}>Resend code</Text>
@@ -279,7 +307,7 @@ export default function SignUpScreen() {
             autoCapitalize="none"
             autoCorrect={false}
           />
-          {errors.fields.emailAddress && <Text style={styles.errorText}>{errors.fields.emailAddress.message}</Text>}
+          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
         </View>
 
         <View style={styles.fieldGroup}>
@@ -297,7 +325,7 @@ export default function SignUpScreen() {
               <Feather name={showPassword ? "eye-off" : "eye"} size={18} color={c.eyeIcon} />
             </Pressable>
           </View>
-          {errors.fields.password && <Text style={styles.errorText}>{errors.fields.password.message}</Text>}
+          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
         </View>
 
         <Pressable

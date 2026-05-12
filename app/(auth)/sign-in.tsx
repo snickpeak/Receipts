@@ -45,6 +45,7 @@ export default function SignInScreen() {
   const { isSignedIn } = useAuth();
   const clerk = useClerk();
   const { signIn, errors, fetchStatus } = useSignIn();
+  const [signInError, setSignInError] = useState("");
   const { signUp } = useSignUp();
   const { startSSOFlow } = useSSO();
   /** Web redirect OAuth lives on `clerk.client.signIn` (SignInResource). Hooks return SignInFuture (`.sso()`), not `.authenticateWithRedirect`. */
@@ -154,8 +155,9 @@ export default function SignInScreen() {
 
   const handleEmailSignIn = async () => {
     if (!email || !password) return;
+    setSignInError("");
     const { error } = await signIn.password({ emailAddress: email, password });
-    if (error) return;
+    if (error) { setSignInError(error.message ?? "Sign in failed. Please try again."); return; }
     if (signIn.status === "complete") {
       if (biometricAvail && !storedEmail) {
         setPendingEmail(email);
@@ -278,7 +280,8 @@ export default function SignInScreen() {
   };
 
   const handleVerify = async () => {
-    await signIn.mfa.verifyEmailCode({ code: verifyCode });
+    const { error } = await signIn.mfa.verifyEmailCode({ code: verifyCode });
+    if (error) { setSignInError(error.message ?? "Invalid code."); return; }
     if (signIn.status === "complete") await finalize();
   };
 
@@ -660,7 +663,7 @@ export default function SignInScreen() {
           keyboardType="numeric"
           textAlign="center"
         />
-        {errors.fields.code && <Text style={styles.errorText}>{errors.fields.code.message}</Text>}
+        {signInError ? <Text style={styles.errorText}>{signInError}</Text> : null}
         <Pressable style={[styles.primaryBtn, { opacity: isLoading ? 0.5 : 1 }]} onPress={handleVerify} disabled={isLoading}>
           {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Verify</Text>}
         </Pressable>
@@ -914,7 +917,7 @@ export default function SignInScreen() {
             autoCapitalize="none"
             autoCorrect={false}
           />
-          {errors.fields.identifier && <Text style={styles.errorText}>{errors.fields.identifier.message}</Text>}
+          {signInError ? <Text style={styles.errorText}>{signInError}</Text> : null}
         </View>
 
         <View style={styles.fieldGroup}>
@@ -937,7 +940,7 @@ export default function SignInScreen() {
               <Feather name={showPassword ? "eye-off" : "eye"} size={18} color={c.eyeIcon} />
             </Pressable>
           </View>
-          {errors.fields.password && <Text style={styles.errorText}>{errors.fields.password.message}</Text>}
+          {signInError ? <Text style={styles.errorText}>{signInError}</Text> : null}
         </View>
 
         <Pressable
