@@ -121,7 +121,12 @@ export default function SignUpScreen() {
     try {
       const { error } = await signUp.verifications.verifyEmailCode({ code: verifyCode });
       if (error) { setCodeError(error.message ?? "Invalid code. Please try again."); return; }
-      await signUp.finalize({ navigate: () => router.replace("/(tabs)" as any) });
+      try {
+        await signUp.finalize({ navigate: () => router.replace("/(tabs)" as any) });
+      } catch {
+        // finalize threw but verification succeeded — navigate directly
+      }
+      router.replace("/(tabs)" as any);
     } catch (err: any) {
       setCodeError(err?.errors?.[0]?.message ?? "Invalid code. Please try again.");
     } finally {
@@ -237,10 +242,13 @@ export default function SignUpScreen() {
           onChangeText={setVerifyCode}
           placeholder="000000"
           placeholderTextColor={c.placeholder}
-          keyboardType="numeric"
+          keyboardType="number-pad"
           maxLength={6}
           textAlign="center"
           autoFocus
+          returnKeyType="done"
+          onSubmitEditing={handleVerify}
+          blurOnSubmit
         />
         {codeError ? <Text style={styles.errorText}>{codeError}</Text> : null}
         <Pressable style={[styles.primaryBtn, { opacity: verifyCode.length < 6 || loading ? 0.5 : 1 }]} onPress={handleVerify} disabled={verifyCode.length < 6 || loading}>

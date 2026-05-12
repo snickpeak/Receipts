@@ -151,7 +151,12 @@ export default function SignInScreen() {
   const logoAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: logoScale.value }] }));
 
   const finalize = useCallback(async () => {
-    await signIn.finalize({ navigate: () => router.replace("/(tabs)" as any) });
+    try {
+      await signIn.finalize({ navigate: () => router.replace("/(tabs)" as any) });
+    } catch {
+      // finalize threw but sign-in succeeded — navigate directly
+    }
+    router.replace("/(tabs)" as any);
   }, [signIn, router]);
 
   const handleEmailSignIn = async () => {
