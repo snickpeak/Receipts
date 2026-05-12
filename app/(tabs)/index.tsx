@@ -159,7 +159,7 @@ function EntryCardInner({
             {isLocked && <Feather name="lock" size={10} color={colors.mutedForeground} />}
           </View>
           <View style={cardStyles.rightRow}>
-            <Text style={[cardStyles.dateLabel, { color: colors.mutedForeground }]}>{dateLabelMap[formatDate(entry.createdAt)] ?? formatDate(entry.createdAt)}</Text>
+            <Text style={[cardStyles.dateLabel, { color: colors.foreground }]}>{dateLabelMap[formatDate(entry.createdAt)] ?? formatDate(entry.createdAt)}</Text>
             <AnimatedIconBounce onPress={onStar}>
               <Feather name="star" size={14} color={entry.starred ? "#f59e0b" : colors.mutedForeground} />
             </AnimatedIconBounce>

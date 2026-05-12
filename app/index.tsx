@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import React, { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
+  ReduceMotion,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -52,10 +53,10 @@ function AnimatedLetter({
 
   useEffect(() => {
     const d = index * LETTER_DELAY;
-    opacity.value = withDelay(d, withTiming(1, { duration: 160 }));
-    translateY.value = withDelay(d, withSpring(0, { damping: 10, stiffness: 180 }));
-    scale.value = withDelay(d, withSpring(1, { damping: 9, stiffness: 200 }));
-    rotate.value = withDelay(d, withSpring(0, { damping: 8, stiffness: 140 }));
+    opacity.value = withDelay(d, withTiming(1, { duration: 160, reduceMotion: ReduceMotion.Never }));
+    translateY.value = withDelay(d, withSpring(0, { damping: 10, stiffness: 180, reduceMotion: ReduceMotion.Never }));
+    scale.value = withDelay(d, withSpring(1, { damping: 9, stiffness: 200, reduceMotion: ReduceMotion.Never }));
+    rotate.value = withDelay(d, withSpring(0, { damping: 8, stiffness: 140, reduceMotion: ReduceMotion.Never }));
   }, []);
 
   const style = useAnimatedStyle(() => ({
@@ -79,8 +80,8 @@ function AnimatedContent({ delay, children, style }: { delay: number; children: 
   const translateY = useSharedValue(10);
 
   useEffect(() => {
-    opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
-    translateY.value = withDelay(delay, withSpring(0, { damping: 14, stiffness: 160 }));
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400, reduceMotion: ReduceMotion.Never }));
+    translateY.value = withDelay(delay, withSpring(0, { damping: 14, stiffness: 160, reduceMotion: ReduceMotion.Never }));
   }, []);
 
   const animStyle = useAnimatedStyle(() => ({
@@ -210,11 +211,11 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontFamily: "Inter_700Bold",
     textAlign: "center",
-    letterSpacing: -0.5,
-    lineHeight: 33,
+    letterSpacing: -0.4,
+    lineHeight: 29,
   },
   subtitle: {
     fontSize: 15,
