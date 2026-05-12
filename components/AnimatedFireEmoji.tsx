@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import Animated, {
+  cancelAnimation,
   Easing,
   ReduceMotion,
   useAnimatedStyle,
@@ -7,6 +8,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { useSettings } from "@/context/SettingsContext";
 
 interface Props {
   size?: number;
@@ -14,11 +16,25 @@ interface Props {
 }
 
 export function AnimatedFireEmoji({ size = 16, accessible = false }: Props) {
-  const scaleY = useSharedValue(0.88);
+  const { settings } = useSettings();
+  const rm = settings.reduceMotion;
+
+  const scaleY = useSharedValue(1);
   const translateY = useSharedValue(0);
-  const rotate = useSharedValue(-7);
+  const rotate = useSharedValue(0);
 
   useEffect(() => {
+    if (rm) {
+      cancelAnimation(scaleY);
+      cancelAnimation(translateY);
+      cancelAnimation(rotate);
+      scaleY.value = withTiming(1, { duration: 200, reduceMotion: ReduceMotion.Never });
+      translateY.value = withTiming(0, { duration: 200, reduceMotion: ReduceMotion.Never });
+      rotate.value = withTiming(0, { duration: 200, reduceMotion: ReduceMotion.Never });
+      return;
+    }
+    scaleY.value = 0.88;
+    rotate.value = -7;
     scaleY.value = withRepeat(
       withTiming(1.16, { duration: 700, easing: Easing.inOut(Easing.sin), reduceMotion: ReduceMotion.Never }),
       -1,
@@ -34,7 +50,7 @@ export function AnimatedFireEmoji({ size = 16, accessible = false }: Props) {
       -1,
       true,
     );
-  }, []);
+  }, [rm]);
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [

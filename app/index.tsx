@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PressableScale } from "@/components/PressableScale";
 import { useColors } from "@/hooks/useColors";
+import { useSettings } from "@/context/SettingsContext";
 
 const TAGLINES = [
   "Keep receipts on the life you're building.",
@@ -46,18 +47,21 @@ function AnimatedLetter({
   index: number;
   color: string;
 }) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(LETTER_Y_OFFSETS[index] ?? 12);
-  const scale = useSharedValue(0.3);
-  const rotate = useSharedValue(LETTER_ROTATIONS[index] ?? 0);
+  const { settings } = useSettings();
+  const rm = settings.reduceMotion;
+  const opacity = useSharedValue(rm ? 1 : 0);
+  const translateY = useSharedValue(rm ? 0 : (LETTER_Y_OFFSETS[index] ?? 12));
+  const scale = useSharedValue(rm ? 1 : 0.3);
+  const rotate = useSharedValue(rm ? 0 : (LETTER_ROTATIONS[index] ?? 0));
 
   useEffect(() => {
+    if (rm) return;
     const d = index * LETTER_DELAY;
     opacity.value = withDelay(d, withTiming(1, { duration: 160, reduceMotion: ReduceMotion.Never }));
     translateY.value = withDelay(d, withSpring(0, { damping: 10, stiffness: 180, reduceMotion: ReduceMotion.Never }));
     scale.value = withDelay(d, withSpring(1, { damping: 9, stiffness: 200, reduceMotion: ReduceMotion.Never }));
     rotate.value = withDelay(d, withSpring(0, { damping: 8, stiffness: 140, reduceMotion: ReduceMotion.Never }));
-  }, []);
+  }, [rm]);
 
   const style = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -76,13 +80,16 @@ function AnimatedLetter({
 }
 
 function AnimatedContent({ delay, children, style }: { delay: number; children: React.ReactNode; style?: object }) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(10);
+  const { settings } = useSettings();
+  const rm = settings.reduceMotion;
+  const opacity = useSharedValue(rm ? 1 : 0);
+  const translateY = useSharedValue(rm ? 0 : 10);
 
   useEffect(() => {
+    if (rm) return;
     opacity.value = withDelay(delay, withTiming(1, { duration: 400, reduceMotion: ReduceMotion.Never }));
     translateY.value = withDelay(delay, withSpring(0, { damping: 14, stiffness: 160, reduceMotion: ReduceMotion.Never }));
-  }, []);
+  }, [rm]);
 
   const animStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

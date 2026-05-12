@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { useColors } from "@/hooks/useColors";
+import { useHaptics } from "@/hooks/useHaptics";
 import { DAILY_PROMPTS, getDailyBaseIndex } from "@/constants/prompts";
 
 const TAG_COLORS: Record<string, string> = {
@@ -27,6 +28,7 @@ const TAG_ICONS: Record<string, string> = {
 
 export function DailyPromptCard() {
   const colors = useColors();
+  const haptics = useHaptics();
   const [dismissed, setDismissed] = useState(false);
   const [shuffleIdx, setShuffleIdx] = useState(0);
 
@@ -43,17 +45,17 @@ export function DailyPromptCard() {
   const tagColor = TAG_COLORS[prompt.tag];
 
   const handleWrite = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact();
     router.push({ pathname: "/add", params: { prompt: prompt.text, tag: prompt.tag } } as any);
   };
 
   const handleDismiss = () => {
-    Haptics.selectionAsync();
+    haptics.selection();
     setDismissed(true);
   };
 
   const handleShuffle = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact();
     spinValue.value = withSequence(
       withTiming(180, { duration: 220 }),
       withTiming(360, { duration: 220 }),

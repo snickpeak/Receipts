@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useSettings } from "@/context/SettingsContext";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -36,6 +37,7 @@ export function PressableScale({
   ...rest
 }: Props) {
   const reducedMotion = useReducedMotion();
+  const { settings } = useSettings();
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -72,7 +74,7 @@ export function PressableScale({
         rest.onPressOut?.(e);
       }}
       onPress={(e) => {
-        if (haptic && !disabled && Platform.OS !== "web") {
+        if (haptic && !disabled && Platform.OS !== "web" && settings.hapticsEnabled) {
           if (haptic === "selection") {
             Haptics.selectionAsync();
           } else {

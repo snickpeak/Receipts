@@ -15,6 +15,7 @@ import Animated, {
 
 import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { AnimatedFireEmoji } from "@/components/AnimatedFireEmoji";
+import { useHaptics } from "@/hooks/useHaptics";
 import { FadeInView } from "@/components/animations/FadeInView";
 import { DAILY_PROMPTS, getDailyBaseIndex } from "@/constants/prompts";
 import { useEntries } from "@/context/EntriesContext";
@@ -35,6 +36,7 @@ export function HeroSection() {
   const prompt = DAILY_PROMPTS[(baseIndex + shuffleIdx) % DAILY_PROMPTS.length];
 
   const tagColor = getTagColor(prompt.tag, settings.customTags);
+  const haptics = useHaptics();
   const tagIcon = getTagIcon(prompt.tag, settings.customTags);
 
   const spinValue = useSharedValue(0);
@@ -199,7 +201,7 @@ export function HeroSection() {
       <Animated.View style={floatStyle} accessible={false}>
         <Pressable
           onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            haptics.impact(Haptics.ImpactFeedbackStyle.Medium);
             router.push({ pathname: "/add", params: { prompt: prompt.text, tag: prompt.tag } } as any);
           }}
           style={({ pressed }) => [styles.challengePressable, { opacity: pressed ? 0.88 : 1 }]}
@@ -240,7 +242,7 @@ export function HeroSection() {
               <Pressable
                 onPress={(e) => {
                   e.stopPropagation?.();
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  haptics.impact();
                   handleShuffle();
                 }}
                 hitSlop={10}

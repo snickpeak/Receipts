@@ -32,6 +32,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { TEMPLATES } from "@/constants/templates";
 import { ENTRY_MOOD_EMOJIS } from "@/lib/entryMoodEmojis";
 import { mergeTags, getTagColor } from "@/lib/tagsLib";
+import { useHaptics } from "@/hooks/useHaptics";
 import { mergeNoteWithOcr, runImageOcr, NOTE_MAX_LENGTH } from "@/lib/imageOcr";
 import { FadeInView, PulseView } from "@/components/animations";
 
@@ -109,6 +110,7 @@ export default function AddEntryScreen() {
   const insets = useSafeAreaInsets();
   const { addEntry } = useEntries();
   const { settings } = useSettings();
+  const haptics = useHaptics();
   const noteRef = useRef<TextInput>(null);
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const params = useLocalSearchParams<{ prompt?: string; tag?: string }>();
@@ -133,7 +135,7 @@ export default function AddEntryScreen() {
   const captureGeo = async () => {
     if (capturingGeo) return;
     setCapturingGeo(true);
-    Haptics.selectionAsync();
+    haptics.selection();
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== "granted") return;
@@ -145,7 +147,7 @@ export default function AddEntryScreen() {
         if (r) place = [r.name, r.city ?? r.region, r.country].filter(Boolean).join(", ");
       } catch { /* offline reverse geocode is fine to skip */ }
       setGeo({ latitude: loc.coords.latitude, longitude: loc.coords.longitude, place });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.notification();
     } catch { /* silent */ }
     finally { setCapturingGeo(false); }
   };
@@ -176,7 +178,7 @@ export default function AddEntryScreen() {
     const t = new Date(); t.setHours(12, 0, 0, 0);
     if (next > t) return; // can't go into the future
     setEntryDate(next);
-    Haptics.selectionAsync();
+    haptics.selection();
   };
 
   const topInset = Platform.OS === "web" ? Math.max(insets.top, 67) : insets.top;
@@ -188,7 +190,7 @@ export default function AddEntryScreen() {
   const handleTemplate = (tpl: (typeof TEMPLATES)[0]) => {
     setSelectedTag(tpl.tag);
     setTitle(tpl.titlePrefix);
-    Haptics.selectionAsync();
+    haptics.selection();
   };
 
   const handlePickPhoto = async () => {
@@ -215,7 +217,7 @@ export default function AddEntryScreen() {
   const handleOcrPhoto = async () => {
     if (!photoUri || ocrBusy) return;
     setOcrBusy(true);
-    Haptics.selectionAsync();
+    haptics.selection();
     try {
       const { supported, text } = await runImageOcr(photoUri);
       if (!supported) {
@@ -228,7 +230,7 @@ export default function AddEntryScreen() {
       }
       const { text: merged, trimmed } = mergeNoteWithOcr(note, text);
       setNote(merged);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.notification();
       if (trimmed) Alert.alert(t.add.extractText, t.add.ocrNoteTrimmed);
     } catch {
       Alert.alert(t.common.error);
@@ -251,7 +253,7 @@ export default function AddEntryScreen() {
     recognition.onerror = () => setListening(false);
     recognition.onend = () => setListening(false);
     recognition.start();
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.impact(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   // ── Voice: native (expo-audio — attaches memo only, no cloud transcription) ─
@@ -273,9 +275,9 @@ export default function AddEntryScreen() {
           }
         } catch { /* fall back to recorder uri */ }
         setAudioUri(persistedUri);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        haptics.notification();
       } catch {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        haptics.notification(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Recording failed", "Could not save the voice memo. Please try again.");
       }
       return;
@@ -287,7 +289,7 @@ export default function AddEntryScreen() {
       if (!granted) return;
       await audioRecorder.record();
       setListening(true);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      haptics.impact(Haptics.ImpactFeedbackStyle.Medium);
     } catch { /* no microphone */ }
   };
 
@@ -301,7 +303,7 @@ export default function AddEntryScreen() {
   // ── Save ────────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     if (!canSave || saving) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.impact(Haptics.ImpactFeedbackStyle.Medium);
     setSaving(true);
     try {
       const createdAt = new Date(entryDate);
@@ -375,7 +377,7 @@ export default function AddEntryScreen() {
                 if (!isToday) {
                   const t = new Date(); t.setHours(12, 0, 0, 0);
                   setEntryDate(t);
-                  Haptics.selectionAsync();
+                  haptics.selection();
                 }
               }}
               style={styles.dateCenter}
@@ -413,7 +415,7 @@ export default function AddEntryScreen() {
               const isSelected = selectedTag === t.label;
               return (
                 <AnimatedTagChip key={t.label} isSelected={isSelected} color={t.color} icon={t.icon} label={t.label} mutedBg={colors.muted} mutedFg={colors.mutedForeground}
-                  onPress={() => { setSelectedTag(t.label); Haptics.selectionAsync(); }} />
+                  onPress={() => { setSelectedTag(t.label); haptics.selection(); }} />
               );
             })}
           </View>
@@ -628,7 +630,7 @@ export default function AddEntryScreen() {
           {/* #5 Mood picker — five-emoji row */}
           <View style={styles.moodRow}>
             {ENTRY_MOOD_EMOJIS.map((m) => (
-              <MoodButton key={m} emoji={m} active={mood === m} tagColor={tagColor} mutedBg={colors.muted} onPress={() => { setMood(mood === m ? null : m); Haptics.selectionAsync(); }} />
+              <MoodButton key={m} emoji={m} active={mood === m} tagColor={tagColor} mutedBg={colors.muted} onPress={() => { setMood(mood === m ? null : m); haptics.selection(); }} />
             ))}
           </View>
 

@@ -44,6 +44,7 @@ import { useSettings } from "@/context/SettingsContext";
 import { useColors } from "@/hooks/useColors";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useHaptics } from "@/hooks/useHaptics";
 import { getRestApiBase } from "@/lib/env";
 import { mergeTags, getTagColor } from "@/lib/tagsLib";
 import { loadPinnedStripOrder, savePinnedStripOrder, sortPinnedEntries } from "@/lib/pinnedStripOrder";
@@ -138,6 +139,7 @@ function EntryCardInner({
 }) {
   const colors = useColors();
   const t = useTranslation();
+  const haptics = useHaptics();
   const isLocked = entry.locked === true;
   const dateLabelMap: Record<string, string> = {
     __today__: t.common.today,
@@ -178,7 +180,7 @@ function EntryCardInner({
             {onPhotoPress ? (
               <Pressable
                 onPress={() => {
-                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  haptics.impact();
                   onPhotoPress(entry.photoUri!);
                 }}
                 accessibilityRole="imagebutton"
@@ -241,10 +243,11 @@ function SwipeableEntryCard({
 }) {
   const { preparePhotoHero } = usePhotoHero();
   const thumbMeasureRef = useRef<View | null>(null);
+  const haptics = useHaptics();
   const swipeableRef = useRef<Swipeable>(null);
   const progress = useSharedValue(0);
   const handleDelete = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    haptics.notification(Haptics.NotificationFeedbackType.Warning);
     swipeableRef.current?.close();
     setTimeout(() => onDelete(entry.id), 150);
   };
@@ -255,7 +258,7 @@ function SwipeableEntryCard({
         friction={1.8}
         overshootRight={false}
         rightThreshold={40}
-        onSwipeableWillOpen={() => { progress.value = withSpring(1); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+        onSwipeableWillOpen={() => { progress.value = withSpring(1); haptics.impact(); }}
         onSwipeableWillClose={() => { progress.value = withSpring(0); }}
         renderRightActions={() => <DeleteAction progress={progress} onDelete={handleDelete} />}
       >
@@ -293,7 +296,7 @@ function SwipeableEntryCard({
             onPhotoPress={onPhotoPress}
             onStar={() => {
               onStar(entry.id);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              haptics.impact();
             }}
           />
         </PressableScale>
@@ -345,9 +348,11 @@ export default function TimelineScreen() {
     ],
   }));
 
+  const haptics = useHaptics();
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact();
     setTimeout(() => setRefreshing(false), 700);
   }, []);
 
@@ -370,7 +375,7 @@ export default function TimelineScreen() {
     }
     if (STREAK_MILESTONES.includes(streak.current) && !milestoneShown.has(streak.current)) {
       setMilestoneShown((s) => new Set(s).add(streak.current));
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.notification();
     }
   }, [streak.current, streak.best, bestStreak, milestoneShown]);
 
@@ -455,11 +460,11 @@ export default function TimelineScreen() {
               haptic="light"
               style={[styles.addButton, { backgroundColor: colors.foreground }]}
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                haptics.impact();
                 router.push("/add");
               }}
               onLongPress={() => {
-                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                haptics.impact(Haptics.ImpactFeedbackStyle.Medium);
                 setFabMenuOpen(true);
               }}
               delayLongPress={420}
@@ -480,7 +485,7 @@ export default function TimelineScreen() {
               isActive={activeTag === tag}
               tagColor={getTagColor(tag, settings.customTags)}
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                haptics.impact();
                 setActiveTag((prev) => (prev === tag ? null : tag));
               }}
             />
@@ -541,7 +546,7 @@ export default function TimelineScreen() {
                 <View style={styles.pinnedSection}>
                   <Pressable
                     onLongPress={() => {
-                      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      haptics.impact(Haptics.ImpactFeedbackStyle.Medium);
                       setReorderPinsOpen(true);
                     }}
                     delayLongPress={460}

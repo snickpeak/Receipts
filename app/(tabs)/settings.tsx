@@ -1019,6 +1019,60 @@ export default function SettingsScreen() {
           />
         </Section>
 
+        {/* Accessibility */}
+        <Section title="Accessibility" delay={290}>
+          {/* VISION */}
+          <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 6 }}>
+            <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", letterSpacing: 1.3, color: colors.mutedForeground }}>
+              VISION
+            </Text>
+          </View>
+          <SettingRow
+            icon="wind"
+            label="Reduce Motion"
+            sublabel="Pause decorative animations in the app"
+            right={
+              <SpringSwitch
+                value={settings.reduceMotion}
+                onValueChange={(v) => updateSettings({ reduceMotion: v })}
+                trackColor={{ false: colors.border, true: "#a855f7" }}
+                thumbColor={colors.foreground}
+              />
+            }
+            borderTop
+          />
+
+          {/* INTERACTION */}
+          <View
+            style={{
+              paddingHorizontal: 16,
+              paddingTop: 14,
+              paddingBottom: 6,
+              marginTop: 6,
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderTopColor: colors.border,
+            }}
+          >
+            <Text style={{ fontSize: 11, fontFamily: "Inter_700Bold", letterSpacing: 1.3, color: colors.mutedForeground }}>
+              INTERACTION
+            </Text>
+          </View>
+          <SettingRow
+            icon="activity"
+            label="Haptic Feedback"
+            sublabel="Vibration and tactile response on taps"
+            right={
+              <SpringSwitch
+                value={settings.hapticsEnabled}
+                onValueChange={(v) => updateSettings({ hapticsEnabled: v })}
+                trackColor={{ false: colors.border, true: "#a855f7" }}
+                thumbColor={colors.foreground}
+              />
+            }
+            borderTop
+          />
+        </Section>
+
         {/* Notifications */}
         <Section title={t.settings.sections.notifications} delay={300}>
           <SettingRow

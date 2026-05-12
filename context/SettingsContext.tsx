@@ -88,6 +88,10 @@ export interface Settings {
   /** Parsed from search or legacy "City, Country" line */
   homeCity: string;
   homeCountry: string;
+
+  // Accessibility
+  reduceMotion: boolean;
+  hapticsEnabled: boolean;
 }
 
 const DEFAULT_PROMPTS: RecurringPrompt[] = [
@@ -130,6 +134,8 @@ const DEFAULT_SETTINGS: Settings = {
   homeLocation: "",
   homeCity: "",
   homeCountry: "",
+  reduceMotion: false,
+  hapticsEnabled: true,
 };
 
 const SETTINGS_KEY = "receipts_settings_v2";
