@@ -920,14 +920,13 @@ export default function SignInScreen() {
           <TextInput
             style={[styles.input, { backgroundColor: c.inputBg, borderColor: c.inputBorder, color: c.inputText }]}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => { setEmail(v); setSignInError(""); }}
             placeholder="you@example.com"
             placeholderTextColor={c.placeholder}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
           />
-          {signInError ? <Text style={styles.errorText}>{signInError}</Text> : null}
         </View>
 
         <View style={styles.fieldGroup}>
@@ -941,7 +940,7 @@ export default function SignInScreen() {
             <TextInput
               style={[styles.input, styles.passwordInput, { backgroundColor: c.inputBg, borderColor: c.inputBorder, color: c.inputText }]}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(v) => { setPassword(v); setSignInError(""); }}
               placeholder="••••••••"
               placeholderTextColor={c.placeholder}
               secureTextEntry={!showPassword}
@@ -950,11 +949,12 @@ export default function SignInScreen() {
               <Feather name={showPassword ? "eye-off" : "eye"} size={18} color={c.eyeIcon} />
             </Pressable>
           </View>
-          {signInError ? <Text style={styles.errorText}>{signInError}</Text> : null}
         </View>
 
+        {signInError ? <Text style={styles.errorText}>{signInError}</Text> : null}
+
         <Pressable
-          style={({ pressed }) => [styles.primaryBtn, { opacity: !email || !password || isLoading ? 0.5 : pressed ? 0.8 : 1 }]}
+          style={({ pressed }) => [styles.primaryBtn, { opacity: !email || !password || isLoading ? 0.5 : pressed ? 0.8 : 1, marginTop: signInError ? 4 : 16 }]}
           onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); handleEmailSignIn(); }}
           disabled={!email || !password || isLoading}
         >
