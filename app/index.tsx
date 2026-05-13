@@ -198,9 +198,7 @@ export default function Index() {
 
       <View style={{ flex: 1.45 }} />
 
-      {introState === "show" && (
-        <IntroOverlay onDone={() => setIntroState("done")} />
-      )}
+      <IntroOverlay onDone={() => setIntroState("done")} />
     </View>
   );
 }
