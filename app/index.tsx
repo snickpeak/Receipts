@@ -92,7 +92,7 @@ function IntroOverlay({ onDone }: { onDone: () => void }) {
 
   useEffect(() => {
     const sub = player.addListener("playToEnd", dismiss);
-    const fallback = setTimeout(dismiss, 2500);
+    const fallback = setTimeout(dismiss, 3300);
     return () => {
       sub.remove();
       clearTimeout(fallback);
