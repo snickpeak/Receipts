@@ -211,7 +211,7 @@ export default function RootLayout() {
     NotoSansEthiopic_500Medium,
     NotoSansEthiopic_600SemiBold,
     NotoSansEthiopic_700Bold,
-    AlwaysClassy: require("../assets/fonts/AlwaysClassy.ttf"),
+    Blankit: require("../assets/fonts/Blankit.ttf"),
   });
 
   useEffect(() => {

@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   letter: {
     fontSize: 52,
-    fontFamily: "AlwaysClassy",
+    fontFamily: "Blankit",
     includeFontPadding: false,
   },
 });
