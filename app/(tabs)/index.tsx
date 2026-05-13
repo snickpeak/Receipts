@@ -313,6 +313,7 @@ export default function TimelineScreen() {
   const t = useTranslation();
   const insets = useSafeAreaInsets();
   const { entries, deleteEntry, toggleStar, tamperDetected, online, pendingSyncCount } = useEntries();
+  const [tamperDismissed, setTamperDismissed] = useState(false);
   const [bestStreak, setBestStreak] = useState(0);
   const [milestoneShown, setMilestoneShown] = useState<Set<number>>(new Set());
   useEffect(() => { void loadBestStreak().then(setBestStreak); }, []);
@@ -516,10 +517,13 @@ export default function TimelineScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#a855f7" />}
           ListHeaderComponent={
             <View>
-              {tamperDetected && (
+              {tamperDetected && !tamperDismissed && (
                 <View style={styles.tamperBanner}>
                   <Feather name="alert-triangle" size={13} color="#ef4444" />
                   <Text style={styles.tamperText}>Tamper detected — entries modified outside the app</Text>
+                  <Pressable onPress={() => setTamperDismissed(true)} hitSlop={12}>
+                    <Feather name="x" size={14} color="#ef4444" />
+                  </Pressable>
                 </View>
               )}
               {!activeTag && onThisDay.length > 0 && (
