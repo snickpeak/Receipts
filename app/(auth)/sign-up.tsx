@@ -106,7 +106,9 @@ export default function SignUpScreen() {
     setEmailError("");
     setPasswordError("");
     try {
-      const { error } = await signUp.password({ emailAddress: email, password });
+      const baseUsername = email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 20);
+      const username = `${baseUsername}_${Math.floor(Math.random() * 90000) + 10000}`;
+      const { error } = await signUp.password({ emailAddress: email, password, username });
       if (error) {
         const msg = error.message ?? "Sign up failed. Please try again.";
         if (error.code?.includes("email")) setEmailError(msg);
