@@ -11,9 +11,9 @@ import { View, StyleSheet } from "react-native";
 
 import { useSettings } from "@/context/SettingsContext";
 
-const LETTERS = ["R", "E", "C", "E", "I", "P", "T", "S"];
-const STAGGER = 70;
-const LETTER_DUR = 420;
+const LETTERS = ["R", "e", "c", "e", "i", "p", "t", "s"];
+const STAGGER = 110;
+const LETTER_DUR = 500;
 export const HANDWRITING_DONE = STAGGER * (LETTERS.length - 1) + LETTER_DUR + 200;
 
 function AnimatedLetter({
@@ -30,7 +30,7 @@ function AnimatedLetter({
   start: boolean;
 }) {
   const opacity = useSharedValue(reduceMotion ? 1 : 0);
-  const translateY = useSharedValue(reduceMotion ? 0 : 18);
+  const translateY = useSharedValue(reduceMotion ? 0 : 14);
 
   useEffect(() => {
     if (!start) return;
@@ -43,7 +43,7 @@ function AnimatedLetter({
       delay,
       withTiming(1, {
         duration: LETTER_DUR,
-        easing: Easing.out(Easing.exp),
+        easing: Easing.out(Easing.cubic),
         reduceMotion: ReduceMotion.Never,
       }),
     );
@@ -51,7 +51,7 @@ function AnimatedLetter({
       delay,
       withTiming(0, {
         duration: LETTER_DUR,
-        easing: Easing.out(Easing.exp),
+        easing: Easing.out(Easing.cubic),
         reduceMotion: ReduceMotion.Never,
       }),
     );
@@ -82,7 +82,7 @@ export function HandwritingReceipts({
   return (
     <View
       accessible
-      accessibilityLabel="RECEIPTS"
+      accessibilityLabel="Receipts"
       accessibilityRole="header"
       style={styles.row}
     >
@@ -107,9 +107,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   letter: {
-    fontSize: 44,
-    fontFamily: "Inter_500Medium",
-    letterSpacing: 10,
+    fontSize: 52,
+    fontFamily: "DancingScript_700Bold",
     includeFontPadding: false,
   },
 });

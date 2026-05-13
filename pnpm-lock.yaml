@@ -11,6 +11,9 @@ importers:
       '@clerk/expo':
         specifier: ^3.2.7
         version: 3.2.10(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@types/react@19.1.17)(bs58@6.0.0)(bufferutil@4.1.0)(expo-auth-session@7.0.11(expo@54.0.34)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0))(expo-constants@18.0.13)(expo-crypto@15.0.9(expo@54.0.34))(expo-local-authentication@17.0.8(expo@54.0.34))(expo-secure-store@15.0.8(expo@54.0.34))(expo-web-browser@15.0.11(expo@54.0.34)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6)))(expo@54.0.34)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@6.0.6)(zod@3.25.76)
+      '@expo-google-fonts/dancing-script':
+        specifier: ^0.4.2
+        version: 0.4.2
       '@expo-google-fonts/inter':
         specifier: ^0.4.0
         version: 0.4.2
@@ -846,6 +849,9 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@expo-google-fonts/dancing-script@0.4.2':
+    resolution: {integrity: sha512-5ASbxOM81Xm6nR9I0eE//l1PGgHtR4uGyMX3eUIw2Jeh+1LnlkrDPg55qjChGnkFfVwMge31vXEUyOZJiy9rxQ==}
 
   '@expo-google-fonts/inter@0.4.2':
     resolution: {integrity: sha512-syfiImMaDmq7cFi0of+waE2M4uSCyd16zgyWxdPOY7fN2VBmSLKEzkfbZgeOjJq61kSqPBNNtXjggiQiSD6gMQ==}
@@ -6211,6 +6217,8 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
       levn: 0.4.1
+
+  '@expo-google-fonts/dancing-script@0.4.2': {}
 
   '@expo-google-fonts/inter@0.4.2': {}
 

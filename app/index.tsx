@@ -84,7 +84,7 @@ function IntroOverlay({ onDone }: { onDone: () => void }) {
   const dismiss = useCallback(() => {
     if (doneCalled.current) return;
     doneCalled.current = true;
-    overlayOpacity.value = withTiming(0, { duration: 700 }, (finished) => {
+    overlayOpacity.value = withTiming(0, { duration: 300 }, (finished) => {
       if (finished) runOnJS(setMounted)(false);
     });
     onDone();
