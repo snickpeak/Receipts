@@ -14,14 +14,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { PressableScale } from "@/components/PressableScale";
 import { HandwritingReceipts, HANDWRITING_DONE } from "@/components/HandwritingReceipts";
 import { useColors } from "@/hooks/useColors";
 import { useSettings } from "@/context/SettingsContext";
-
-const INTRO_KEY = "receipts_intro_seen_v1";
 
 const TAGLINES = [
   "Keep receipts on the life you're building.",
@@ -87,7 +84,6 @@ function IntroOverlay({ onDone }: { onDone: () => void }) {
   const dismiss = useCallback(() => {
     if (doneCalled.current) return;
     doneCalled.current = true;
-    AsyncStorage.setItem(INTRO_KEY, "true").catch(() => {});
     overlayOpacity.value = withTiming(0, { duration: 700 }, (finished) => {
       if (finished) runOnJS(setMounted)(false);
     });
@@ -131,13 +127,7 @@ export default function Index() {
     [],
   );
 
-  const [introState, setIntroState] = useState<"checking" | "show" | "done">("checking");
-
-  useEffect(() => {
-    AsyncStorage.getItem(INTRO_KEY).then((val) => {
-      setIntroState(val === "true" ? "done" : "show");
-    }).catch(() => setIntroState("done"));
-  }, []);
+  const [introState, setIntroState] = useState<"show" | "done">("show");
 
   return (
     <View
@@ -163,7 +153,7 @@ export default function Index() {
       </AnimatedContent>
 
       <View style={styles.brandRow}>
-        <HandwritingReceipts color={colors.foreground} />
+        <HandwritingReceipts color={colors.foreground} start={introState === "done"} />
       </View>
 
       <AnimatedContent delay={HANDWRITING_DONE} style={styles.textBlock}>
@@ -280,7 +270,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
   },
   introOverlay: {
-    backgroundColor: "#000",
+    backgroundColor: "#fff",
     zIndex: 999,
   },
 });

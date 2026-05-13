@@ -21,16 +21,19 @@ function AnimatedLetter({
   color,
   delay,
   reduceMotion,
+  start,
 }: {
   char: string;
   color: string;
   delay: number;
   reduceMotion: boolean;
+  start: boolean;
 }) {
   const opacity = useSharedValue(reduceMotion ? 1 : 0);
   const translateY = useSharedValue(reduceMotion ? 0 : 18);
 
   useEffect(() => {
+    if (!start) return;
     if (reduceMotion) {
       opacity.value = 1;
       translateY.value = 0;
@@ -52,7 +55,7 @@ function AnimatedLetter({
         reduceMotion: ReduceMotion.Never,
       }),
     );
-  }, [reduceMotion]);
+  }, [start, reduceMotion]);
 
   const animStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -66,7 +69,13 @@ function AnimatedLetter({
   );
 }
 
-export function HandwritingReceipts({ color }: { color: string }) {
+export function HandwritingReceipts({
+  color,
+  start = true,
+}: {
+  color: string;
+  start?: boolean;
+}) {
   const { settings } = useSettings();
   const rm = settings.reduceMotion;
 
@@ -84,6 +93,7 @@ export function HandwritingReceipts({ color }: { color: string }) {
           color={color}
           delay={i * STAGGER}
           reduceMotion={rm}
+          start={start}
         />
       ))}
     </View>
