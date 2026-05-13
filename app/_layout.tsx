@@ -11,7 +11,6 @@ import {
   NotoSansEthiopic_600SemiBold,
   NotoSansEthiopic_700Bold,
 } from "@expo-google-fonts/noto-sans-ethiopic";
-import { DancingScript_700Bold } from "@expo-google-fonts/dancing-script";
 import { ClerkLoaded, ClerkProvider } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -212,7 +211,7 @@ export default function RootLayout() {
     NotoSansEthiopic_500Medium,
     NotoSansEthiopic_600SemiBold,
     NotoSansEthiopic_700Bold,
-    DancingScript_700Bold,
+    AlwaysClassy: require("../assets/fonts/AlwaysClassy.ttf"),
   });
 
   useEffect(() => {
