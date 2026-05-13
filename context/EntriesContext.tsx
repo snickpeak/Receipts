@@ -165,8 +165,9 @@ function computeChain(entries: Entry[], allowMissing: boolean): { entries: Entry
 
 import { getRestApiBase, warnMissingNativeDomainOnce } from "@/lib/env";
 
-const STORAGE_KEY = "receipts_entries_v1";
-const TAMPER_KEY = "receipts_tamper_flag_v1";
+const STORAGE_KEY_PREFIX = "receipts_entries_v1";
+const TAMPER_KEY_PREFIX = "receipts_tamper_flag_v1";
+const QUEUE_KEY_PREFIX = "receipts_sync_queue_v1";
 
 const EntriesContext = createContext<EntriesContextType | null>(null);
 
@@ -211,7 +212,18 @@ function entryTimestamp(entry: Entry) {
 }
 
 export function EntriesProvider({ children }: { children: React.ReactNode }) {
-  const { getToken, isSignedIn } = useAuth();
+  const { getToken, isSignedIn, userId } = useAuth();
+
+  // Per-user storage keys — each Clerk account (and guest) gets its own
+  // isolated namespace so switching accounts never leaks data.
+  const userKey = userId ?? "guest";
+  const storageKeyRef = useRef(`${STORAGE_KEY_PREFIX}_${userKey}`);
+  const tamperKeyRef = useRef(`${TAMPER_KEY_PREFIX}_${userKey}`);
+  const queueKeyRef = useRef(`${QUEUE_KEY_PREFIX}_${userKey}`);
+  storageKeyRef.current = `${STORAGE_KEY_PREFIX}_${userKey}`;
+  tamperKeyRef.current = `${TAMPER_KEY_PREFIX}_${userKey}`;
+  queueKeyRef.current = `${QUEUE_KEY_PREFIX}_${userKey}`;
+
   const [entries, setEntries] = useState<Entry[]>([]);
   const [tamperDetected, setTamperDetected] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -282,7 +294,7 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshPendingCount = useCallback(async () => {
-    setPendingSyncCount(await queueLength());
+    setPendingSyncCount(await queueLength(queueKeyRef.current));
   }, []);
   useEffect(() => { void refreshPendingCount(); }, [refreshPendingCount]);
 
@@ -302,20 +314,17 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
   }, [getToken]);
 
   const persistLocal = useCallback(async (newEntries: Entry[]) => {
-    // On writes, every entry comes from in-app code so we don't expect any to be
-    // missing hashes — but allow legacy entries to migrate. Never *clear* the
-    // tamper flag here; only the explicit acknowledge path can clear it.
     const { entries: chained, tampered } = computeChain(newEntries, true);
     setEntries(chained);
     if (tampered) {
       setTamperDetected(true);
-      await AsyncStorage.setItem(TAMPER_KEY, "1");
+      await AsyncStorage.setItem(tamperKeyRef.current, "1");
     }
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(chained));
+    await AsyncStorage.setItem(storageKeyRef.current, JSON.stringify(chained));
   }, []);
 
   const loadLocal = useCallback(async () => {
-    const data = await AsyncStorage.getItem(STORAGE_KEY);
+    const data = await AsyncStorage.getItem(storageKeyRef.current);
     if (!data) return [] as Entry[];
     try {
       return JSON.parse(data) as Entry[];
@@ -371,24 +380,31 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
   }, [apiFetch, loadLocal, mergeEntries, persistLocal]);
 
   useEffect(() => {
+    // Clear stale in-memory state immediately when the account changes so
+    // another user's entries are never visible while new data loads.
+    setEntries([]);
+    setTamperDetected(false);
+    setSyncError(null);
+    syncedRef.current = false;
+
     void (async () => {
       const data = await loadLocal();
-      const persistedFlag = await AsyncStorage.getItem(TAMPER_KEY);
+      const persistedFlag = await AsyncStorage.getItem(tamperKeyRef.current);
       if (data.length) {
-        // Legacy migration: if NO entry has a hash, treat as first-time init (no tamper).
         const anyHashed = data.some((e) => !!e.hash);
         const { entries: chained, tampered } = computeChain(data, !anyHashed);
         setEntries(chained);
         const isTampered = tampered || persistedFlag === "1";
         setTamperDetected(isTampered);
-        if (tampered) await AsyncStorage.setItem(TAMPER_KEY, "1");
-        // Persist back so all entries acquire a hash going forward (one-time migration only).
-        if (!anyHashed) await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(chained));
+        if (tampered) await AsyncStorage.setItem(tamperKeyRef.current, "1");
+        if (!anyHashed) await AsyncStorage.setItem(storageKeyRef.current, JSON.stringify(chained));
       } else if (persistedFlag === "1") {
         setTamperDetected(true);
       }
     })();
-  }, [loadLocal]);
+  // userKey is the reactive value — changes on sign-in, sign-out, or account switch.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userKey, loadLocal]);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -415,7 +431,7 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
     if (!cryptoReadyRef.current) return;
     drainingRef.current = true;
     try {
-      const ops = await readQueue();
+      const ops = await readQueue(queueKeyRef.current);
       const processed = new Set<string>();
       const retryOps: SyncOp[] = [];
       for (const op of ops) {
@@ -429,21 +445,18 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
           } else {
             res = await apiFetch(`/${op.entryId}`, { method: "DELETE" });
           }
-          // Treat 5xx and 429 (rate limit) as transient, retry. 401 is also
-          // worth retrying once auth refreshes. Everything else (2xx success
-          // or terminal 4xx like 400/404/409/422) is considered processed.
           transient = res.status >= 500 || res.status === 429 || res.status === 401;
         } catch {
-          transient = true; // network error
+          transient = true;
         }
         if (transient) {
           if (op.attempts < 5) retryOps.push({ ...op, attempts: op.attempts + 1 });
-          else processed.add(op.id); // terminal drop after 6 total attempts
+          else processed.add(op.id);
         } else {
           processed.add(op.id);
         }
       }
-      const remaining = await replaceProcessed(processed, retryOps);
+      const remaining = await replaceProcessed(processed, retryOps, queueKeyRef.current);
       setPendingSyncCount(remaining);
     } finally {
       drainingRef.current = false;
@@ -455,14 +468,13 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
   const syncEntry = useCallback(async (entry: Entry) => {
     if (localOnlyModeRef.current) return;
     const payload = encryptForCloud(entry);
-    await enqueue({ op: "create", entryId: entry.id, payload });
+    await enqueue({ op: "create", entryId: entry.id, payload }, queueKeyRef.current);
     await refreshPendingCount();
     void drainQueue();
   }, [encryptForCloud, drainQueue, refreshPendingCount]);
 
   const syncUpdate = useCallback(async (entryId: string, payload: Record<string, unknown>) => {
     if (localOnlyModeRef.current) return;
-    // Encrypt mutable fields if present.
     const ctx = cryptoRef.current;
     let p = payload;
     if (ctx.enabled && ctx.passphrase) {
@@ -471,14 +483,14 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
       if (typeof p.note === "string") p.note = encryptString(p.note, ctx.passphrase, ctx.salt);
       if (typeof p.aiSummary === "string") p.aiSummary = encryptString(p.aiSummary, ctx.passphrase, ctx.salt);
     }
-    await enqueue({ op: "update", entryId, payload: p });
+    await enqueue({ op: "update", entryId, payload: p }, queueKeyRef.current);
     await refreshPendingCount();
     void drainQueue();
   }, [drainQueue, refreshPendingCount]);
 
   const syncDelete = useCallback(async (entryId: string) => {
     if (localOnlyModeRef.current) return;
-    await enqueue({ op: "delete", entryId });
+    await enqueue({ op: "delete", entryId }, queueKeyRef.current);
     await refreshPendingCount();
     void drainQueue();
   }, [drainQueue, refreshPendingCount]);
