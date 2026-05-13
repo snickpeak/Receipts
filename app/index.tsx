@@ -92,7 +92,7 @@ function IntroOverlay({ onDone }: { onDone: () => void }) {
 
   useEffect(() => {
     const sub = player.addListener("playToEnd", dismiss);
-    const fallback = setTimeout(dismiss, 8000);
+    const fallback = setTimeout(dismiss, 1000);
     return () => {
       sub.remove();
       clearTimeout(fallback);
@@ -140,63 +140,67 @@ export default function Index() {
         },
       ]}
     >
-      <View style={{ flex: 1 }} />
+      {introState === "done" && (
+        <>
+          <View style={{ flex: 1 }} />
 
-      <AnimatedContent delay={0} style={styles.logoWrapOuter}>
-        <LinearGradient
-          accessible={false}
-          colors={["#a855f730", "transparent"]}
-          style={styles.logoWrap}
-        >
-          <Feather name="layers" size={34} color="#a855f7" accessible={false} />
-        </LinearGradient>
-      </AnimatedContent>
+          <AnimatedContent delay={0} style={styles.logoWrapOuter}>
+            <LinearGradient
+              accessible={false}
+              colors={["#a855f730", "transparent"]}
+              style={styles.logoWrap}
+            >
+              <Feather name="layers" size={34} color="#a855f7" accessible={false} />
+            </LinearGradient>
+          </AnimatedContent>
 
-      <View style={styles.brandRow}>
-        <HandwritingReceipts color={colors.foreground} start={introState === "done"} />
-      </View>
+          <View style={styles.brandRow}>
+            <HandwritingReceipts color={colors.foreground} start={true} />
+          </View>
 
-      <AnimatedContent delay={HANDWRITING_DONE} style={styles.textBlock}>
-        <Text style={[styles.title, { color: colors.foreground }]}>
-          {tagline}
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-          Your private journal for moments, wins, and receipts worth keeping.
-        </Text>
-      </AnimatedContent>
+          <AnimatedContent delay={HANDWRITING_DONE} style={styles.textBlock}>
+            <Text style={[styles.title, { color: colors.foreground }]}>
+              {tagline}
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
+              Your private journal for moments, wins, and receipts worth keeping.
+            </Text>
+          </AnimatedContent>
 
-      <AnimatedContent delay={HANDWRITING_DONE + 180} style={styles.btnBlock}>
-        <PressableScale
-          style={styles.primaryBtn}
-          haptic="medium"
-          onPress={() => router.replace("/(tabs)")}
-          accessibilityRole="button"
-          accessibilityLabel="Open app preview"
-        >
-          <Text
-            style={[styles.primaryBtnText, { color: "#fff" }]}
-            accessible={false}
-          >
-            Open preview
-          </Text>
-        </PressableScale>
-        <PressableScale
-          style={styles.secondaryBtn}
-          scaleTo={0.96}
-          onPress={() => router.replace("/(auth)/sign-in")}
-          accessibilityRole="button"
-          accessibilityLabel="Go to sign in"
-        >
-          <Text
-            style={[styles.secondaryBtnText, { color: "#a855f7" }]}
-            accessible={false}
-          >
-            Go to sign in
-          </Text>
-        </PressableScale>
-      </AnimatedContent>
+          <AnimatedContent delay={HANDWRITING_DONE + 180} style={styles.btnBlock}>
+            <PressableScale
+              style={styles.primaryBtn}
+              haptic="medium"
+              onPress={() => router.replace("/(tabs)")}
+              accessibilityRole="button"
+              accessibilityLabel="Open app preview"
+            >
+              <Text
+                style={[styles.primaryBtnText, { color: "#fff" }]}
+                accessible={false}
+              >
+                Open preview
+              </Text>
+            </PressableScale>
+            <PressableScale
+              style={styles.secondaryBtn}
+              scaleTo={0.96}
+              onPress={() => router.replace("/(auth)/sign-in")}
+              accessibilityRole="button"
+              accessibilityLabel="Go to sign in"
+            >
+              <Text
+                style={[styles.secondaryBtnText, { color: "#a855f7" }]}
+                accessible={false}
+              >
+                Go to sign in
+              </Text>
+            </PressableScale>
+          </AnimatedContent>
 
-      <View style={{ flex: 1.45 }} />
+          <View style={{ flex: 1.45 }} />
+        </>
+      )}
 
       <IntroOverlay onDone={() => setIntroState("done")} />
     </View>
