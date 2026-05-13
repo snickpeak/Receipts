@@ -12,8 +12,8 @@ import { View, StyleSheet } from "react-native";
 import { useSettings } from "@/context/SettingsContext";
 
 const LETTERS = ["R", "e", "c", "e", "i", "p", "t", "s"];
-const STAGGER = 110;
-const LETTER_DUR = 500;
+const STAGGER = 80;
+const LETTER_DUR = 300;
 export const HANDWRITING_DONE = STAGGER * (LETTERS.length - 1) + LETTER_DUR + 200;
 
 function AnimatedLetter({
