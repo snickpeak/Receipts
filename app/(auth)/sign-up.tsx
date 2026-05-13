@@ -123,7 +123,8 @@ export default function SignUpScreen() {
     try {
       const { error } = await signUp.verifications.verifyEmailCode({ code: verifyCode });
       if (error) { setCodeError(error.message ?? "Invalid code. Please try again."); return; }
-      await signUp.finalize({});
+      const { error: finalizeError } = await signUp.finalize({});
+      if (finalizeError) { setCodeError(finalizeError.message ?? "Account creation failed. Please try again."); return; }
       router.replace("/(tabs)" as any);
     } catch (err: any) {
       setCodeError(err?.errors?.[0]?.message ?? err?.message ?? "Account creation failed. Please try again.");

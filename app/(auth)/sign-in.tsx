@@ -151,12 +151,9 @@ export default function SignInScreen() {
   const logoAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: logoScale.value }] }));
 
   const finalize = useCallback(async () => {
-    try {
-      await signIn.finalize({});
-      router.replace("/(tabs)" as any);
-    } catch (err: any) {
-      setSignInError(err?.errors?.[0]?.message ?? err?.message ?? "Sign in failed. Please try again.");
-    }
+    const { error } = await signIn.finalize({});
+    if (error) { setSignInError(error.message ?? "Sign in failed. Please try again."); return; }
+    router.replace("/(tabs)" as any);
   }, [signIn, router]);
 
   const handleEmailSignIn = async () => {
