@@ -91,6 +91,16 @@ export default function SignUpScreen() {
   }, []);
   const logoAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: logoScale.value }] }));
 
+  const attemptFinalize = async (setError: (msg: string) => void) => {
+    const { error } = await signUp.finalize({});
+    if (error) {
+      setError(`[finalize error] ${error.code ?? ""}: ${error.message ?? "Account creation failed."}`);
+      return false;
+    }
+    router.replace("/(tabs)" as any);
+    return true;
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setEmailError("");
@@ -104,10 +114,18 @@ export default function SignUpScreen() {
         else setEmailError(msg);
         return;
       }
-      const { error: sendError } = await signUp.verifications.sendEmailCode();
-      if (sendError) {
-        setEmailError(sendError.message ?? "Could not send verification email. Please try again.");
+      // If Clerk already considers this sign-up complete (e.g. email verified in a prior session), finalize now
+      if (signUp.status === "complete") {
+        await attemptFinalize(setEmailError);
         return;
+      }
+      // Only send a code if the email still needs verification
+      if (signUp.unverifiedFields.includes("email_address")) {
+        const { error: sendError } = await signUp.verifications.sendEmailCode();
+        if (sendError) {
+          setEmailError(sendError.message ?? "Could not send verification email. Please try again.");
+          return;
+        }
       }
       setPendingVerification(true);
     } catch (err: any) {
@@ -121,15 +139,24 @@ export default function SignUpScreen() {
     setLoading(true);
     setCodeError("");
     try {
-      const { error } = await signUp.verifications.verifyEmailCode({ code: verifyCode });
-      if (error) { setCodeError(error.message ?? "Invalid code. Please try again."); return; }
+      // Only attempt verification if email is still in unverifiedFields
+      const needsVerify = signUp.unverifiedFields.includes("email_address");
+      if (needsVerify) {
+        const { error } = await signUp.verifications.verifyEmailCode({ code: verifyCode });
+        if (error) {
+          // "already been verified" means a prior attempt consumed the code — fall through to status check
+          if (!error.message?.toLowerCase().includes("already been verified")) {
+            setCodeError(error.message ?? "Invalid code. Please try again.");
+            return;
+          }
+        }
+      }
       if (signUp.status !== "complete") {
-        setCodeError(`Incomplete sign-up. Missing: ${signUp.missingFields.join(", ") || signUp.status}`);
+        const missing = signUp.missingFields.length > 0 ? signUp.missingFields.join(", ") : "none";
+        setCodeError(`[status: ${signUp.status}] Missing fields: ${missing}`);
         return;
       }
-      const { error: finalizeError } = await signUp.finalize({});
-      if (finalizeError) { setCodeError(finalizeError.message ?? "Account creation failed. Please try again."); return; }
-      router.replace("/(tabs)" as any);
+      await attemptFinalize(setCodeError);
     } catch (err: any) {
       setCodeError(err?.errors?.[0]?.message ?? err?.message ?? "Account creation failed. Please try again.");
     } finally {
