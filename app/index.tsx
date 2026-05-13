@@ -1,10 +1,12 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useEffect, useMemo } from "react";
+import { useVideoPlayer, VideoView } from "expo-video";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
   ReduceMotion,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -12,11 +14,14 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { PressableScale } from "@/components/PressableScale";
 import { HandwritingReceipts, HANDWRITING_DONE } from "@/components/HandwritingReceipts";
 import { useColors } from "@/hooks/useColors";
 import { useSettings } from "@/context/SettingsContext";
+
+const INTRO_KEY = "receipts_intro_seen_v1";
 
 const TAGLINES = [
   "Keep receipts on the life you're building.",
@@ -65,6 +70,57 @@ function AnimatedContent({
   return <Animated.View style={[animStyle, style]}>{children}</Animated.View>;
 }
 
+function IntroOverlay({ onDone }: { onDone: () => void }) {
+  const overlayOpacity = useSharedValue(1);
+  const [mounted, setMounted] = useState(true);
+  const doneCalled = useRef(false);
+
+  const player = useVideoPlayer(
+    require("../assets/videos/intro.mp4"),
+    (p) => {
+      p.loop = false;
+      p.muted = false;
+      p.play();
+    },
+  );
+
+  const dismiss = useCallback(() => {
+    if (doneCalled.current) return;
+    doneCalled.current = true;
+    AsyncStorage.setItem(INTRO_KEY, "true").catch(() => {});
+    overlayOpacity.value = withTiming(0, { duration: 700 }, (finished) => {
+      if (finished) runOnJS(setMounted)(false);
+    });
+    onDone();
+  }, [overlayOpacity, onDone]);
+
+  useEffect(() => {
+    const sub = player.addListener("playToEnd", dismiss);
+    const fallback = setTimeout(dismiss, 8000);
+    return () => {
+      sub.remove();
+      clearTimeout(fallback);
+    };
+  }, [player, dismiss]);
+
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
+
+  if (!mounted) return null;
+
+  return (
+    <Animated.View style={[StyleSheet.absoluteFill, styles.introOverlay, animStyle]}>
+      <VideoView
+        player={player}
+        style={StyleSheet.absoluteFill}
+        contentFit="contain"
+        nativeControls={false}
+      />
+    </Animated.View>
+  );
+}
+
 export default function Index() {
   const insets = useSafeAreaInsets();
   const topInset = Math.max(insets.top, 24);
@@ -74,6 +130,14 @@ export default function Index() {
     () => TAGLINES[Math.floor(Math.random() * TAGLINES.length)],
     [],
   );
+
+  const [introState, setIntroState] = useState<"checking" | "show" | "done">("checking");
+
+  useEffect(() => {
+    AsyncStorage.getItem(INTRO_KEY).then((val) => {
+      setIntroState(val === "true" ? "done" : "show");
+    }).catch(() => setIntroState("done"));
+  }, []);
 
   return (
     <View
@@ -86,10 +150,8 @@ export default function Index() {
         },
       ]}
     >
-      {/* Top spacer — smaller to raise content above true center */}
       <View style={{ flex: 1 }} />
 
-      {/* Icon */}
       <AnimatedContent delay={0} style={styles.logoWrapOuter}>
         <LinearGradient
           accessible={false}
@@ -100,7 +162,6 @@ export default function Index() {
         </LinearGradient>
       </AnimatedContent>
 
-      {/* SVG stroke-dashoffset handwriting animation */}
       <View style={styles.brandRow}>
         <HandwritingReceipts color={colors.foreground} />
       </View>
@@ -145,8 +206,11 @@ export default function Index() {
         </PressableScale>
       </AnimatedContent>
 
-      {/* Bottom spacer — larger to shift content upward (~3 lines) */}
       <View style={{ flex: 1.45 }} />
+
+      {introState === "show" && (
+        <IntroOverlay onDone={() => setIntroState("done")} />
+      )}
     </View>
   );
 }
@@ -214,5 +278,9 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     fontSize: 14,
     fontFamily: "Inter_500Medium",
+  },
+  introOverlay: {
+    backgroundColor: "#000",
+    zIndex: 999,
   },
 });
