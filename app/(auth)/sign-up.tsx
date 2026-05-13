@@ -23,6 +23,7 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTim
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthGlowBackground } from "@/components/AuthGlowBackground";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useSettings } from "@/context/SettingsContext";
 
 const GUEST_KEY = "receipts_guest_mode_v1";
 
@@ -50,8 +51,9 @@ export default function SignUpScreen() {
   const topInset = Platform.OS === "web" ? Math.max(insets.top, 67) : insets.top;
   const bottomInset = Platform.OS === "web" ? 34 : insets.bottom;
 
+  const { settings } = useSettings();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme !== "light";
+  const isDark = settings.appearanceMode === "dark" || (settings.appearanceMode === "system" && colorScheme === "dark");
   const c = {
     bg: isDark ? "#080808" : "#f5f5f5",
     text: isDark ? "#f0f0f0" : "#111111",
@@ -121,14 +123,10 @@ export default function SignUpScreen() {
     try {
       const { error } = await signUp.verifications.verifyEmailCode({ code: verifyCode });
       if (error) { setCodeError(error.message ?? "Invalid code. Please try again."); return; }
-      try {
-        await signUp.finalize({ navigate: () => router.replace("/(tabs)" as any) });
-      } catch {
-        // finalize threw but verification succeeded — navigate directly
-      }
+      await signUp.finalize({});
       router.replace("/(tabs)" as any);
     } catch (err: any) {
-      setCodeError(err?.errors?.[0]?.message ?? "Invalid code. Please try again.");
+      setCodeError(err?.errors?.[0]?.message ?? err?.message ?? "Account creation failed. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -152,11 +152,11 @@ export default function SignInScreen() {
 
   const finalize = useCallback(async () => {
     try {
-      await signIn.finalize({ navigate: () => router.replace("/(tabs)" as any) });
-    } catch {
-      // finalize threw but sign-in succeeded — navigate directly
+      await signIn.finalize({});
+      router.replace("/(tabs)" as any);
+    } catch (err: any) {
+      setSignInError(err?.errors?.[0]?.message ?? err?.message ?? "Sign in failed. Please try again.");
     }
-    router.replace("/(tabs)" as any);
   }, [signIn, router]);
 
   const handleEmailSignIn = async () => {
