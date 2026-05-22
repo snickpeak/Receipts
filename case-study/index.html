@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receipts — Case Study</title>
+  <meta name="description" content="Receipts is a privacy-focused mobile journaling app built with Expo, React Native, TypeScript, and Clerk. Full SDLC case study." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080808;
+      --surface: #111111;
+      --border: #1f1f1f;
+      --purple: #a855f7;
+      --purple-dim: #a855f720;
+      --fg: #f0f0f0;
+      --muted: #888;
+      --subtle: #444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--purple); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 60px;
+      background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    /* SECTIONS */
+    section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    section:first-of-type { padding-top: 160px; }
+
+    .divider {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* HERO */
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--purple);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-label::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+    }
+
+    h1 {
+      font-size: clamp(40px, 6vw, 68px);
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      color: var(--fg);
+    }
+
+    h1 span {
+      color: var(--purple);
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .badge.highlight {
+      border-color: var(--purple);
+      color: var(--purple);
+      background: var(--purple-dim);
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.85; text-decoration: none; }
+
+    .btn-primary {
+      background: var(--purple);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* SECTION HEADINGS */
+    .section-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: clamp(26px, 3vw, 36px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      color: var(--fg);
+    }
+
+    .section-intro {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.75;
+      margin-bottom: 56px;
+    }
+
+    /* PROBLEM */
+    .problem-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--purple);
+      border-radius: 12px;
+      padding: 32px 36px;
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--fg);
+      font-weight: 300;
+      margin-bottom: 40px;
+    }
+
+    .problem-block strong {
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .insight-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .insight-card .number {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--purple);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .insight-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* FEATURES */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .feature-cell {
+      background: var(--surface);
+      padding: 28px;
+      transition: background 0.2s;
+    }
+
+    .feature-cell:hover { background: #161616; }
+
+    .feature-icon {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .feature-cell h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--fg);
+    }
+
+    .feature-cell p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* TECH STACK */
+    .stack-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .stack-table thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--subtle);
+      padding: 0 0 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stack-table tbody td {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .stack-table tbody tr:last-child td { border-bottom: none; }
+
+    .stack-table .layer {
+      color: var(--muted);
+      font-size: 13px;
+      width: 180px;
+    }
+
+    .stack-table .tech {
+      color: var(--fg);
+      font-weight: 500;
+    }
+
+    .stack-table .reason {
+      color: var(--muted);
+      font-size: 13px;
+      padding-left: 32px;
+    }
+
+    /* SDLC */
+    .sdlc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .sdlc-item {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 32px;
+      padding: 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      transition: background 0.2s;
+    }
+
+    .sdlc-item:last-child { border-bottom: none; }
+    .sdlc-item:hover { background: #161616; }
+
+    .sdlc-phase {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--purple);
+      padding-top: 3px;
+    }
+
+    .sdlc-content h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 8px;
+    }
+
+    .sdlc-content p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ROADMAP */
+    .roadmap-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .roadmap-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 14px;
+    }
+
+    .roadmap-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .roadmap-item.planned .dot { background: var(--subtle); }
+    .roadmap-item.active .dot { background: var(--purple); box-shadow: 0 0 0 3px var(--purple-dim); }
+
+    .roadmap-item .label { color: var(--fg); font-weight: 500; flex: 1; }
+    .roadmap-item .tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+
+    .roadmap-item.active .tag {
+      color: var(--purple);
+      border-color: var(--purple);
+      background: var(--purple-dim);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 16px;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--subtle);
+    }
+
+    footer .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    footer .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      section { padding: 80px 20px; }
+      section:first-of-type { padding-top: 120px; }
+      .sdlc-item { grid-template-columns: 1fr; gap: 8px; }
+      .stack-table .reason { padding-left: 0; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">Receipts</span>
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#sdlc">SDLC</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <p class="hero-label">Case Study</p>
+    <h1>Receipts<br /><span>Private Journal</span></h1>
+    <p class="hero-sub">
+      A privacy-first mobile journaling app built for people who document intentionally.
+      No feeds. No algorithms. No noise — just your story.
+    </p>
+    <div class="hero-meta">
+      <span class="badge highlight">iOS App</span>
+      <span class="badge">React Native + Expo</span>
+      <span class="badge">TypeScript</span>
+      <span class="badge">Clerk Auth</span>
+      <span class="badge">TestFlight</span>
+      <span class="badge">EAS Build</span>
+    </div>
+    <div class="cta-row">
+      <a href="https://github.com/snickpeak/Receipts" target="_blank" class="btn btn-primary">View Source Code</a>
+      <a href="#problem" class="btn btn-ghost">Read Case Study</a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <p class="section-eyebrow">Problem Statement</p>
+    <h2>Journaling apps are built for the wrong thing</h2>
+    <p class="section-intro">
+      Most journaling apps optimize for streaks, sharing, and engagement. They turn private reflection into a performance metric. Receipts was built to solve a different problem entirely.
+    </p>
+
+    <div class="problem-block">
+      People lose track of their own story. <strong>Wins get forgotten. Promises fade.</strong>
+      The moments that shaped you disappear into your camera roll or the back of your mind.
+      There's no focused, private place to keep receipts on what you did, what was said,
+      and what you've built — until now.
+    </div>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="number">0</div>
+        <p>Social features, feeds, followers, or ads. Privacy is the product.</p>
+      </div>
+      <div class="insight-card">
+        <div class="number">5</div>
+        <p>Core entry tags: Win, Money, Memory, Promise, Proof — each meaningful.</p>
+      </div>
+      <div class="insight-card">
+        <div class="number">100%</div>
+        <p>On-device processing for biometric auth, OCR, and semantic search.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <p class="section-eyebrow">Features</p>
+    <h2>Built for how people actually capture moments</h2>
+    <p class="section-intro">
+      Every feature was scoped around one question: does this help someone keep a better record of their life, or does it distract from it?
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-cell">
+        <div class="feature-icon">📝</div>
+        <h3>Rich Entries</h3>
+        <p>Photos, voice memos, mood tags, and auto-tagged GPS location attached to every entry.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">🔍</div>
+        <h3>Semantic Search</h3>
+        <p>TF-IDF ranked search across all entries — keyword and semantic, fully on-device.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">📷</div>
+        <h3>OCR Scanning</h3>
+        <p>Point the camera at a physical receipt, note, or handwriting — text is extracted instantly.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">🧵</div>
+        <h3>Memory Threads</h3>
+        <p>Related entries are automatically clustered by tag and time proximity into connected threads.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">🗓</div>
+        <h3>Calendar Heatmap</h3>
+        <p>Year, month, and day views with activity heatmaps to see patterns in your journaling.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">📍</div>
+        <h3>Places</h3>
+        <p>Browse all geo-tagged entries on a dedicated map view. See where your story happened.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">🔐</div>
+        <h3>Biometric Lock</h3>
+        <p>App-level and per-entry Face ID protection. Decoy PIN mode hides sensitive content.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">📊</div>
+        <h3>Weekly Digest</h3>
+        <p>A 7-day summary of entries, streaks, word counts, tag breakdowns, and mood overview.</p>
+      </div>
+      <div class="feature-cell">
+        <div class="feature-icon">💾</div>
+        <h3>Export & Backup</h3>
+        <p>Full JSON and Markdown export. Your data is yours — always portable, never locked in.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- TECH STACK -->
+  <section id="stack">
+    <p class="section-eyebrow">Tech Stack</p>
+    <h2>Decisions made for the long term</h2>
+    <p class="section-intro">
+      Every technology choice was made to maximize developer velocity, minimize third-party dependencies, and keep user data on-device wherever possible.
+    </p>
+
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th class="reason">Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="layer">Language</td>
+          <td class="tech">TypeScript 5.9</td>
+          <td class="reason">Strict mode throughout — catches bugs at compile time, not runtime.</td>
+        </tr>
+        <tr>
+          <td class="layer">Framework</td>
+          <td class="tech">React Native 0.81.5</td>
+          <td class="reason">Native performance, cross-platform reach, large ecosystem.</td>
+        </tr>
+        <tr>
+          <td class="layer">SDK</td>
+          <td class="tech">Expo 54 (New Architecture)</td>
+          <td class="reason">Managed workflow with new architecture enabled for JSI performance.</td>
+        </tr>
+        <tr>
+          <td class="layer">Navigation</td>
+          <td class="tech">Expo Router 6</td>
+          <td class="reason">File-based routing — predictable, typesafe, deep-link ready.</td>
+        </tr>
+        <tr>
+          <td class="layer">Auth</td>
+          <td class="tech">Clerk</td>
+          <td class="reason">Full auth system without building session management from scratch.</td>
+        </tr>
+        <tr>
+          <td class="layer">Data Fetching</td>
+          <td class="tech">TanStack Query v5</td>
+          <td class="reason">Server state, caching, and optimistic updates out of the box.</td>
+        </tr>
+        <tr>
+          <td class="layer">Animations</td>
+          <td class="tech">React Native Reanimated 4</td>
+          <td class="reason">UI thread animations — no JS bridge, 60fps guaranteed.</td>
+        </tr>
+        <tr>
+          <td class="layer">Build</td>
+          <td class="tech">EAS Build + EAS Submit</td>
+          <td class="reason">Cloud builds, auto-submit to TestFlight, no local Xcode required.</td>
+        </tr>
+        <tr>
+          <td class="layer">Compiler</td>
+          <td class="tech">React Compiler (experimental)</td>
+          <td class="reason">Automatic memoization — eliminates manual useMemo/useCallback.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SDLC -->
+  <section id="sdlc">
+    <p class="section-eyebrow">SDLC Process</p>
+    <h2>From concept to App Store</h2>
+    <p class="section-intro">
+      This project was built end-to-end — product definition, architecture, development, release pipeline, and App Store compliance.
+    </p>
+
+    <div class="sdlc-list">
+      <div class="sdlc-item">
+        <div class="sdlc-phase">Discovery</div>
+        <div class="sdlc-content">
+          <h3>Problem definition and scope</h3>
+          <p>Identified the gap in the journaling market — existing apps optimize for engagement over privacy. Scoped MVP around private capture, search, and retrieval. Defined core tag taxonomy (Win, Money, Memory, Promise, Proof) as the organizational backbone.</p>
+        </div>
+      </div>
+      <div class="sdlc-item">
+        <div class="sdlc-phase">Architecture</div>
+        <div class="sdlc-content">
+          <h3>Stack selection and system design</h3>
+          <p>Chose Expo for managed workflow and fast iteration. File-based routing via Expo Router for maintainable navigation. Clerk to avoid building custom auth. TanStack Query for server state with optimistic updates. Designed offline-first data model from day one.</p>
+        </div>
+      </div>
+      <div class="sdlc-item">
+        <div class="sdlc-phase">Development</div>
+        <div class="sdlc-content">
+          <h3>Vertical slices, ship early</h3>
+          <p>Built in priority order: auth flow → core entry CRUD → search and calendar → advanced features (OCR, voice memos, geolocation, biometric lock, threads). TypeScript strict mode throughout. React Compiler enabled for automatic performance optimization.</p>
+        </div>
+      </div>
+      <div class="sdlc-item">
+        <div class="sdlc-phase">Quality</div>
+        <div class="sdlc-content">
+          <h3>Static analysis and device testing</h3>
+          <p>TypeScript compiler as primary static analysis gate. Tested on physical iPhone hardware via Expo Go and development builds. Reduce Motion accessibility support throughout all animations. Validated biometric, OCR, and location flows on-device.</p>
+        </div>
+      </div>
+      <div class="sdlc-item">
+        <div class="sdlc-phase">Release</div>
+        <div class="sdlc-content">
+          <h3>EAS Build pipeline + TestFlight</h3>
+          <p>EAS Build configured with development, preview, and production profiles. Production iOS builds auto-submitted to TestFlight via <code>eas build --auto-submit</code>. Android EAS Submit configured for Google Play internal track.</p>
+        </div>
+      </div>
+      <div class="sdlc-item">
+        <div class="sdlc-phase">Compliance</div>
+        <div class="sdlc-content">
+          <h3>Apple Privacy Manifest and App Store review</h3>
+          <p>Completed Apple Privacy Manifest for all accessed API categories. Permission strings written for Face ID, camera, microphone, and location. Declared no exempt encryption. No third-party analytics or ad SDKs included. App Store metadata, screenshots, and keywords prepared for submission.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ROADMAP -->
+  <section id="roadmap">
+    <p class="section-eyebrow">Roadmap</p>
+    <h2>What's being built next</h2>
+    <p class="section-intro">
+      Post-launch priorities focused on platform expansion, hardware integrations, and ambient intelligence.
+    </p>
+
+    <div class="roadmap-list">
+      <div class="roadmap-item active">
+        <div class="dot"></div>
+        <span class="label">iOS App Store release</span>
+        <span class="tag">In Progress</span>
+      </div>
+      <div class="roadmap-item planned">
+        <div class="dot"></div>
+        <span class="label">Android — Google Play release</span>
+        <span class="tag">Planned</span>
+      </div>
+      <div class="roadmap-item planned">
+        <div class="dot"></div>
+        <span class="label">Apple Watch companion — quick capture from wrist</span>
+        <span class="tag">Planned</span>
+      </div>
+      <div class="roadmap-item planned">
+        <div class="dot"></div>
+        <span class="label">On-device AI — query your journal with no internet</span>
+        <span class="tag">Planned</span>
+      </div>
+      <div class="roadmap-item planned">
+        <div class="dot"></div>
+        <span class="label">NFC trigger points — tap a sticker to open a new entry</span>
+        <span class="tag">Planned</span>
+      </div>
+      <div class="roadmap-item planned">
+        <div class="dot"></div>
+        <span class="label">Lock screen and home screen widgets</span>
+        <span class="tag">Planned</span>
+      </div>
+      <div class="roadmap-item planned">
+        <div class="dot"></div>
+        <span class="label">StandBy mode — ambient display while charging</span>
+        <span class="tag">Planned</span>
+      </div>
+      <div class="roadmap-item planned">
+        <div class="dot"></div>
+        <span class="label">iCloud sync — cross-device access</span>
+        <span class="tag">Planned</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <footer>
+    <p>Built by <a href="https://github.com/snickpeak" target="_blank">snickpeak</a> &mdash; Receipts &copy; 2026</p>
+    <div class="footer-links">
+      <a href="https://github.com/snickpeak/Receipts" target="_blank">GitHub</a>
+      <a href="#hero">Back to top</a>
+    </div>
+  </footer>
+
+</body>
+</html>
