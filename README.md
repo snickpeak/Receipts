@@ -75,7 +75,18 @@ A full-featured iOS journaling app submitted to the Apple App Store in one devel
 
 ## Screenshots
 
-> App Store screenshots coming post-approval.
+<p align="center">
+  <img src="screenshots/01-landing.jpg" width="18%" alt="Landing screen" />
+  <img src="screenshots/02-timeline.jpg" width="18%" alt="Timeline" />
+  <img src="screenshots/03-entry-win.jpg" width="18%" alt="New entry – Win" />
+  <img src="screenshots/08-entry-memory.jpg" width="18%" alt="New entry – Memory" />
+  <img src="screenshots/06-entry-proof.png" width="18%" alt="New entry – Proof" />
+</p>
+<p align="center">
+  <img src="screenshots/04-entry-detail.jpg" width="18%" alt="Entry detail with photo" />
+  <img src="screenshots/05-calendar.jpg" width="18%" alt="Calendar view" />
+  <img src="screenshots/07-entry-lesson.jpg" width="18%" alt="New entry – Lesson" />
+</p>
 
 ---
 
