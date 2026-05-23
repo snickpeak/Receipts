@@ -6,7 +6,8 @@
 [![Built with Expo](https://img.shields.io/badge/built%20with-Expo%2054-000020?style=flat-square&logo=expo)](https://expo.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![Auth](https://img.shields.io/badge/auth-Clerk-6C47FF?style=flat-square)](https://clerk.com)
-[![Release](https://img.shields.io/badge/release-App%20Store%20Review-0D96F6?style=flat-square&logo=apple)](https://apps.apple.com)
+[![Release](https://img.shields.io/badge/App%20Store-Under%20Review-0D96F6?style=flat-square&logo=apple)](https://apps.apple.com)
+[![Submitted](https://img.shields.io/badge/submitted-May%202026-34C759?style=flat-square&logo=apple)](https://apps.apple.com)
 
 ---
 
