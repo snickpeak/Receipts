@@ -16,7 +16,7 @@
 
 **A privacy-first iOS journaling app — built solo, shipped to the App Store.**
 
-[Product Requirements](#product-requirements) · [Engineering Highlights](#engineering-highlights) · [Screenshots](#screenshots) · [Tech Stack](#tech-stack) · [SDLC](#sdlc-process) · [Docs](#product--sdlc-documentation) · [Setup](#getting-started)
+[Engineering Highlights](#engineering-highlights) · [Screenshots](#screenshots) · [Tech Stack](#tech-stack) · [Changelog](./CHANGELOG.md) · [Docs](#product--sdlc-documentation) · [Setup](#getting-started)
 
 </div>
 
@@ -153,6 +153,7 @@ Full product and program management documentation lives in `/docs`:
 
 | Document | Description |
 |---|---|
+| [Changelog](./CHANGELOG.md) | Full v1.0.0 release notes — every feature shipped in the initial release |
 | [PRD](./docs/PRD.md) | Product requirements, problem statement, target users, goals, user flows, success metrics |
 | [User Stories](./docs/USER_STORIES.md) | 30 user stories across 9 feature areas with acceptance criteria and status labels |
 | [Roadmap](./docs/ROADMAP.md) | v1.0 shipped features, v1.1 near-term, v2.0 future vision, technical debt |
