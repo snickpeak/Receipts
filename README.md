@@ -12,6 +12,7 @@
 [![Expo](https://img.shields.io/badge/Expo%20SDK-54-000020?style=flat-square&logo=expo)](https://expo.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![Auth](https://img.shields.io/badge/Auth-Clerk-6C47FF?style=flat-square)](https://clerk.com)
+[![CI](https://github.com/snickpeak/Receipts/actions/workflows/ci.yml/badge.svg)](https://github.com/snickpeak/Receipts/actions/workflows/ci.yml)
 
 **A privacy-first iOS journaling app — built solo, shipped to the App Store.**
 
@@ -155,6 +156,8 @@ Full product and program management documentation lives in `/docs`:
 | [PRD](./docs/PRD.md) | Product requirements, problem statement, target users, goals, user flows, success metrics |
 | [User Stories](./docs/USER_STORIES.md) | 30 user stories across 9 feature areas with acceptance criteria and status labels |
 | [Roadmap](./docs/ROADMAP.md) | v1.0 shipped features, v1.1 near-term, v2.0 future vision, technical debt |
+| [Architecture](./docs/ARCHITECTURE.md) | System diagram, data flows, privacy model, and layer-by-layer breakdown |
+| [Decisions](./docs/DECISIONS.md) | 8 Architecture Decision Records — context, options considered, and rationale for key choices |
 | [QA Test Plan](./docs/QA_TEST_PLAN.md) | 100+ manual test cases across launch, auth, entries, privacy, data, and release readiness |
 | [Release Checklist](./docs/RELEASE_CHECKLIST.md) | App Store Connect, TestFlight, privacy/legal, and pre-submission checklist with status |
 | [Backlog](./docs/BACKLOG.md) | MoSCoW prioritized backlog — 30 items with feature, rationale, and status |
