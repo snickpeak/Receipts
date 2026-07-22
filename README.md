@@ -4,7 +4,7 @@
 
 # Receipts – Private Journal
 
-### *Keep receipts on the life you're building.*
+### *Keep receipts on your life.*
 
 [![Platform](https://img.shields.io/badge/platform-iOS-000000?style=flat-square&logo=apple)](https://apps.apple.com)
 [![Submitted](https://img.shields.io/badge/App%20Store-Under%20Review-34C759?style=flat-square&logo=apple)](https://apps.apple.com)
@@ -12,7 +12,7 @@
 [![Expo](https://img.shields.io/badge/Expo%20SDK-54-000020?style=flat-square&logo=expo)](https://expo.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![Auth](https://img.shields.io/badge/Auth-Clerk-6C47FF?style=flat-square)](https://clerk.com)
-[![CI](https://github.com/snickpeak/Receipts/actions/workflows/ci.yml/badge.svg)](https://github.com/snickpeak/Receipts/actions/workflows/ci.yml)
+[![CI](https://github.com/haile-y-haile/Receipts/actions/workflows/ci.yml/badge.svg)](https://github.com/haile-y-haile/Receipts/actions/workflows/ci.yml)
 
 **A privacy-first iOS journaling app — built solo, shipped to the App Store.**
 
@@ -182,7 +182,7 @@ Built in vertical slices: auth flow → core entry CRUD → search and calendar 
 TypeScript compiler (`tsc --noEmit`) as primary static analysis. Tested on physical iPhone hardware across all main user flows. Full manual QA checklist documented — see [QA Test Plan](./docs/QA_TEST_PLAN.md).
 
 **Build & Release**
-EAS Build configured with `development`, `preview`, and `production` profiles. Production iOS build auto-submitted to TestFlight via `eas build --auto-submit`. Build 31 (v1.0.0) submitted to Apple App Store Review on May 22, 2026.
+EAS Build configured with `development`, `preview`, and `production` profiles. Production iOS build auto-submitted to TestFlight via `eas build --auto-submit`. Initially submitted to Apple App Store Review as Build 31 (v1.0.0) on May 22, 2026; currently at Build 35 after iterating on review feedback.
 
 **Privacy & Compliance**
 Apple Privacy Manifest completed. NSUsageDescription strings written for all sensitive APIs (Face ID, camera, microphone, location). `ITSAppUsesNonExemptEncryption: false` declared. No third-party analytics or advertising SDKs included. Privacy policy published and linked in App Store Connect.
@@ -250,7 +250,7 @@ Full roadmap with rationale in [docs/ROADMAP.md](./docs/ROADMAP.md).
 ### Install
 
 ```bash
-git clone https://github.com/snickpeak/Receipts.git
+git clone https://github.com/haile-y-haile/Receipts.git
 cd Receipts
 pnpm install
 ```
@@ -285,6 +285,6 @@ MIT — see [LICENSE](./LICENSE) for details.
 
 <div align="center">
 
-Built by **[snickpeak](https://github.com/snickpeak)** · Support: receipts.support@gmail.com
+Built by **[Haile Haile](https://github.com/haile-y-haile)** · Support: <receipts.support@gmail.com>
 
 </div>
